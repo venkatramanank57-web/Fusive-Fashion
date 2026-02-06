@@ -1,0 +1,210 @@
+/* src/index.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-dawn text-baltic font-primary;
+  }
+}
+
+@layer components {
+  /* ===================================== */
+  /* SKELETON LOADER COMPONENTS */
+  /* ===================================== */
+  
+  /* Basic skeleton with shimmer effect */
+  .skeleton {
+    @apply relative overflow-hidden bg-gray-200;
+  }
+  
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: shimmer 1.5s infinite;
+  }
+  
+  /* Text skeleton */
+  .skeleton-text {
+    @apply h-4 bg-gray-200 rounded mb-2;
+  }
+  
+  /* Circle skeleton (for avatars) */
+  .skeleton-circle {
+    @apply rounded-full bg-gray-200;
+  }
+  
+  /* Image skeleton */
+  .skeleton-image {
+    @apply w-full aspect-square bg-gray-200 rounded;
+  }
+  
+  /* Button skeleton */
+  .skeleton-button {
+    @apply h-10 bg-gray-200 rounded;
+  }
+  
+  /* Card skeleton */
+  .skeleton-card {
+    @apply bg-white rounded-lg shadow-sm overflow-hidden;
+  }
+  
+  /* ===================================== */
+  /* LOADING STATES */
+  /* ===================================== */
+  
+  /* Loading spinner */
+  .loading-spinner {
+    @apply inline-block h-8 w-8 animate-spin rounded-full border-[3px] border-solid border-baltic border-r-transparent;
+  }
+  
+  /* Loading dots */
+  .loading-dots {
+    @apply flex space-x-2;
+  }
+  
+  .loading-dots div {
+    @apply h-2 w-2 rounded-full bg-baltic;
+    animation: bounce 1.4s infinite ease-in-out both;
+  }
+  
+  .loading-dots div:nth-child(1) { animation-delay: -0.32s; }
+  .loading-dots div:nth-child(2) { animation-delay: -0.16s; }
+  
+  /* Page loader overlay */
+  .page-loader {
+    @apply fixed inset-0 z-50 flex items-center justify-center bg-dawn/80 backdrop-blur-sm;
+  }
+  
+  /* ===================================== */
+  /* PRODUCT SPECIFIC SKELETONS */
+  /* ===================================== */
+  
+  /* Product grid skeleton */
+  .product-grid-skeleton {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
+  }
+  
+  /* Product card skeleton */
+  .product-card-skeleton {
+    @apply skeleton-card;
+  }
+  
+  /* Product details skeleton */
+  .product-details-skeleton {
+    @apply min-h-screen bg-gray-50 py-8;
+  }
+  
+  /* Cart skeleton */
+  .cart-skeleton {
+    @apply min-h-screen bg-gray-50 py-12;
+  }
+}
+
+@layer utilities {
+  /* ===================================== */
+  /* ANIMATION UTILITIES */
+  /* ===================================== */
+  
+  /* Staggered animation delays */
+  .animation-delay-100 { animation-delay: 100ms; }
+  .animation-delay-200 { animation-delay: 200ms; }
+  .animation-delay-300 { animation-delay: 300ms; }
+  .animation-delay-400 { animation-delay: 400ms; }
+  .animation-delay-500 { animation-delay: 500ms; }
+  
+  /* Pulse animation variations */
+  .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+  .animate-pulse-fast { animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+  
+  /* Fade animations */
+  .animate-fade-in { animation: fadeIn 0.5s ease-in-out; }
+  .animate-slide-up { animation: slideUp 0.3s ease-out; }
+  
+  /* Custom gradients */
+  .bg-shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+  }
+  
+  /* Hide scrollbar */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Smooth transitions */
+  .transition-smooth {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  /* Glass morphism */
+  .glass-morphism {
+    @apply backdrop-blur-md bg-white/20 border border-white/30;
+  }
+}
+
+/* ===================================== */
+/* KEYFRAMES DEFINITIONS */
+/* ===================================== */
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

@@ -1,0 +1,656 @@
+// =====================================
+// src/components/Header.jsx
+// =====================================
+
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { ShoppingBag, User, Menu, X, Search, Heart, Plus, Minus, Globe, ChevronRight } from "lucide-react";
+
+export default function Header() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDesktopMenuOpen, setIsDesktopMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [openAccordions, setOpenAccordions] = useState([]);
+
+  // Get cart items count from Redux store
+  const cartCount = useSelector((state) => state.cart.items.length);
+  
+  // Get wishlist items count from Redux store
+  const wishlistItems = useSelector((state) => state.wishlist.items);
+  const wishlistCount = wishlistItems.length;
+  
+  // Get customer login token
+  const token = useSelector((state) => state.customer.token);
+
+  const navigate = useNavigate();
+
+  // Menu items structure
+  const menuItems = [
+    {
+      title: "Clothing",
+      hasSubmenu: true,
+      subItems: [
+        { label: "View All", path: "/collections/clothing" },
+        { label: "Denim", path: "/collections/denim" },
+        { label: "Printed", path: "/collections/printed" },
+        { label: "Solids", path: "/collections/solids" },
+        { label: "Bodycon", path: "/collections/bodycon" },
+      ]
+    },
+    {
+      title: "Bestsellers",
+      hasSubmenu: true,
+      subItems: [
+        { label: "Mini Bag", path: "/products/mini-bag" },
+        { label: "Summer Dress", path: "/products/summer-dress" },
+        { label: "Black Handbag", path: "/products/black-handbag" },
+      ]
+    },
+    {
+      title: "Sale",
+      path: "/collections/sale",
+      hasSubmenu: false,
+    },
+    {
+      title: "New Arrivals",
+      path: "/collections/new-arrivals",
+      hasSubmenu: false,
+    },
+    {
+      title: "Lookbook",
+      path: "/lookbook",
+      hasSubmenu: false,
+    },
+    {
+      title: "About Us",
+      path: "/about",
+      hasSubmenu: false,
+    },
+  ];
+
+  const bottomMenuItems = [
+    { title: "Login / Register", path: token ? "/account" : "/login" },
+    { title: "FAQ", path: "/faq" },
+    { title: "Contact", path: "/contact" },
+  ];
+
+  const toggleAccordion = (title) => {
+    if (openAccordions.includes(title)) {
+      setOpenAccordions(openAccordions.filter(item => item !== title));
+    } else {
+      setOpenAccordions([...openAccordions, title]);
+    }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      setIsSearchOpen(false);
+      setSearchQuery("");
+    }
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+    if (!isMobileMenuOpen) {
+      setOpenAccordions([]);
+    }
+  };
+
+  const toggleDesktopMenu = () => {
+    setIsDesktopMenuOpen(!isDesktopMenuOpen);
+    if (!isDesktopMenuOpen) {
+      setOpenAccordions([]);
+    }
+  };
+
+  const toggleSearch = () => {
+    setIsSearchOpen(!isSearchOpen);
+    if (isSearchOpen) {
+      setSearchQuery("");
+    }
+  };
+
+  const closeAllMenus = () => {
+    setIsMobileMenuOpen(false);
+    setIsDesktopMenuOpen(false);
+    setOpenAccordions([]);
+  };
+
+  // Close menu when clicking outside (for desktop)
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isDesktopMenuOpen && !event.target.closest('.desktop-menu-drawer') && !event.target.closest('.hamburger-button')) {
+        setIsDesktopMenuOpen(false);
+        setOpenAccordions([]);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isDesktopMenuOpen]);
+
+  return (
+    <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
+    
+
+      {/* Main Header */}
+      <div className="px-4">
+        {/* MOBILE HEADER */}
+        <div className="lg:hidden flex items-center justify-between h-16">
+          {/* LEFT SIDE: Hamburger + Search + Wishlist */}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={toggleMobileMenu}
+              className="p-2 rounded-md text-gray-700 hover:text-black"
+              aria-label="Menu"
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+
+            <button
+              onClick={toggleSearch}
+              className="p-2 rounded-full text-gray-700 hover:text-black"
+              aria-label="Search"
+            >
+              <Search size={20} />
+            </button>
+
+            <button
+              onClick={() => navigate("/wishlist")}
+              className="relative p-2 rounded-full text-gray-700 hover:text-red-500"
+              aria-label="Wishlist"
+            >
+              <Heart size={20} />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {wishlistCount}
+                </span>
+              )}
+            </button>
+          </div>
+
+          {/* CENTER: Brand Name */}
+          <div className="absolute left-1/2 transform -translate-x-1/2">
+            <Link to="/" className="flex items-center">
+              <span className="text-lg font-bold text-gray-900 whitespace-nowrap">
+                Fusive
+              </span>
+            </Link>
+          </div>
+
+          {/* RIGHT SIDE: Account + Cart */}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => navigate(token ? "/account" : "/login")}
+              className="p-2 rounded-full text-gray-700 hover:text-black"
+              aria-label={token ? "Account" : "Login"}
+            >
+              <User size={20} />
+            </button>
+
+            <Link
+              to="/cart"
+              className="relative p-2 rounded-full text-gray-700 hover:text-black"
+              aria-label="Cart"
+            >
+              <ShoppingBag size={20} />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+          </div>
+        </div>
+
+        {/* DESKTOP HEADER */}
+        <div className="hidden lg:block">
+          <div className="flex items-center justify-between h-20">
+            {/* Desktop: Left Side - Hamburger */}
+            <div className="flex items-center space-x-8">
+              <button
+                onClick={toggleDesktopMenu}
+                className="hamburger-button p-2 rounded-md text-gray-700 hover:text-black"
+                aria-label="Menu"
+              >
+                <Menu size={24} />
+              </button>
+              
+              <Link
+                to="/collections/clothing"
+                className="text-sm font-medium text-gray-700 hover:text-black relative group"
+              >
+                Clothing
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+              <Link
+                to="/collections/sale"
+                className="text-sm font-medium text-red-600 hover:text-red-700 font-semibold relative group"
+              >
+                Sale
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-red-600 transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            </div>
+
+            {/* Desktop: Center - Brand Name */}
+            <div className="absolute left-1/2 transform -translate-x-1/2">
+              <Link to="/" className="flex items-center">
+                <span className="text-2xl font-bold text-gray-900">
+                  Fusive Fashion
+                </span>
+              </Link>
+            </div>
+
+            {/* Desktop: Right Side */}
+            <div className="flex items-center space-x-6">
+              <div className="flex items-center space-x-1">
+                <span className="text-sm font-medium text-gray-700">INR</span>
+                <span className="text-xs text-gray-500">▼</span>
+              </div>
+
+              <button
+                onClick={toggleSearch}
+                className="p-2 rounded-full text-gray-700 hover:text-black"
+                aria-label="Search"
+              >
+                <Search size={20} />
+              </button>
+
+              <button
+                onClick={() => navigate("/wishlist")}
+                className="relative p-2 rounded-full text-gray-700 hover:text-red-500"
+                aria-label="Wishlist"
+              >
+                <Heart size={20} />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {wishlistCount}
+                  </span>
+                )}
+              </button>
+
+              <button
+                onClick={() => navigate(token ? "/account" : "/login")}
+                className="flex items-center gap-2 p-2 rounded-full text-gray-700 hover:text-black"
+              >
+                <User size={20} />
+                <span className="text-sm font-medium relative inline-block group">
+                  {token ? "Account" : "Login"}
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+                </span>
+              </button>
+
+              <Link
+                to="/cart"
+                className="relative p-2 rounded-full text-gray-700 hover:text-black"
+              >
+                <ShoppingBag size={20} />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Search Overlay */}
+        {isSearchOpen && (
+          <div className="absolute left-0 right-0 top-full bg-white border-t border-gray-100 shadow-lg z-50">
+            <div className="px-4 py-4">
+              <form onSubmit={handleSearch} className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search products..."
+                  className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none"
+                  autoFocus
+                />
+                <Search 
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" 
+                  size={20} 
+                />
+                <button
+                  type="submit"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black"
+                >
+                  <Search size={18} />
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* DESKTOP MENU DRAWER (Left Side - Divided Navigation) */}
+        {isDesktopMenuOpen && (
+          <>
+            {/* Backdrop Overlay */}
+            <div 
+              className="fixed inset-0 bg-black bg-opacity-30 z-40 transition-opacity duration-300"
+              onClick={closeAllMenus}
+            />
+            
+            {/* Drawer Menu - INCREASED WIDTH */}
+            <div className="desktop-menu-drawer fixed inset-y-0 left-0 w-96 bg-white z-50 transform transition-transform duration-300 ease-in-out shadow-2xl">
+              {/* Drawer Header with FULL WIDTH border bottom */}
+              <div className="flex items-center justify-between p-6 border-b border-gray-300">
+                <span className="text-xl font-bold text-gray-900">Fusive Fashion</span>
+                <button
+                  onClick={closeAllMenus}
+                  className="p-2 rounded-full text-gray-500 hover:text-black"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              {/* Scrollable Menu Content */}
+              <div className="h-[calc(100vh-73px)] overflow-y-auto">
+                {/* Main Menu Items with Divided Lines */}
+                <div className="py-4">
+                  {menuItems.map((item, index) => (
+                    <div key={index} className="relative">
+                      {item.hasSubmenu ? (
+                        <>
+                          {/* Accordion Header */}
+                          <div className="px-6 py-4">
+                            <button
+                              onClick={() => toggleAccordion(item.title)}
+                              className="w-full flex items-center justify-between text-left relative group"
+                            >
+                              <div className="flex items-center relative">
+                                <span className="font-medium text-gray-900 group-hover:text-black transition-colors relative inline-block">
+                                  {item.title}
+                                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+                                </span>
+                              </div>
+                              <span className="text-gray-400">
+                                {openAccordions.includes(item.title) ? (
+                                  <Minus size={18} />
+                                ) : (
+                                  <Plus size={18} />
+                                )}
+                              </span>
+                            </button>
+                          </div>
+                          
+                          {/* Accordion Content - REMOVED BACKGROUND COLOR */}
+                          {openAccordions.includes(item.title) && (
+                            <div className="mx-6 mb-2">
+                              {item.subItems.map((subItem, subIndex) => (
+                                <Link
+                                  key={subIndex}
+                                  to={subItem.path}
+                                  onClick={closeAllMenus}
+                                  className="block px-2 py-3 text-gray-600 hover:text-black transition-colors"
+                                >
+                                  <div className="flex items-center relative group">
+                                    <span className="relative inline-block">
+                                      {subItem.label}
+                                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+                                    </span>
+                                  </div>
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                          
+                          {/* DIVIDER LINE */}
+                          <div className="px-6">
+                            <hr className="border-t border-gray-200" />
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          {/* Regular Menu Item */}
+                          <div className="px-6 py-4">
+                            <Link
+                              to={item.path}
+                              onClick={closeAllMenus}
+                              className="block font-medium text-gray-900 hover:text-black transition-colors"
+                            >
+                              <span className="relative inline-block group">
+                                {item.title}
+                                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+                              </span>
+                            </Link>
+                          </div>
+                          
+                          {/* DIVIDER LINE */}
+                          <div className="px-6">
+                            <hr className="border-t border-gray-200" />
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Bottom Menu Items */}
+                <div className="py-4 border-t border-gray-300">
+                  <div className="space-y-0">
+                    {bottomMenuItems.map((item, index) => (
+                      <div key={index} className="relative">
+                        {/* Menu Item */}
+                        <div className="px-6 py-4">
+                          <Link
+                            to={item.path}
+                            onClick={closeAllMenus}
+                            className="block text-gray-700 hover:text-black transition-colors"
+                          >
+                            <span className="relative inline-block group">
+                              {item.title}
+                              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+                            </span>
+                          </Link>
+                        </div>
+                        
+                        {/* DIVIDER LINE (except for last item) */}
+                        {index < bottomMenuItems.length - 1 && (
+                          <div className="px-6">
+                            <hr className="border-t border-gray-200" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Country & Currency Section */}
+                  <div className="mt-4">
+                    <div className="relative">
+                      {/* Content */}
+                      <div className="px-6 py-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <Globe size={18} className="text-gray-500 mr-3" />
+                            <div>
+                              <p className="font-medium text-gray-900">INDIA | INR</p>
+                              <p className="text-sm text-gray-500">Change country/region</p>
+                            </div>
+                          </div>
+                          <span className="text-2xl">🌍</span>
+                        </div>
+                      </div>
+                      
+                      {/* DIVIDER LINE (last line) */}
+                      <div className="px-6">
+                        <hr className="border-t border-gray-200" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* MOBILE MENU DRAWER */}
+        {isMobileMenuOpen && (
+          <>
+            {/* Backdrop Overlay */}
+            <div 
+              className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden transition-opacity duration-300"
+              onClick={closeAllMenus}
+            />
+            
+            {/* Drawer Menu - INCREASED WIDTH */}
+            <div className="fixed inset-y-0 left-0 w-96 bg-white z-50 lg:hidden transform transition-transform duration-300 ease-in-out">
+              {/* Drawer Header with FULL WIDTH border bottom */}
+              <div className="flex items-center justify-between p-6 border-b border-gray-300">
+                <span className="text-xl font-bold text-gray-900">Fusive Fashion</span>
+                <button
+                  onClick={closeAllMenus}
+                  className="p-2 rounded-full text-gray-500 hover:text-black"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              {/* Scrollable Menu Content */}
+              <div className="h-[calc(100vh-73px)] overflow-y-auto">
+                {/* Main Menu Items */}
+                <div className="py-4">
+                  {menuItems.map((item, index) => (
+                    <div key={index} className="relative">
+                      {item.hasSubmenu ? (
+                        <>
+                          {/* Accordion Header */}
+                          <div className="px-6 py-4">
+                            <button
+                              onClick={() => toggleAccordion(item.title)}
+                              className="w-full flex items-center justify-between text-left relative group"
+                            >
+                              <div className="flex items-center relative">
+                                <span className="font-medium text-gray-900 group-hover:text-black transition-colors relative inline-block">
+                                  {item.title}
+                                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+                                </span>
+                              </div>
+                              <span className="text-gray-400">
+                                {openAccordions.includes(item.title) ? (
+                                  <Minus size={18} />
+                                ) : (
+                                  <Plus size={18} />
+                                )}
+                              </span>
+                            </button>
+                          </div>
+                          
+                          {/* Accordion Content - REMOVED BACKGROUND COLOR */}
+                          {openAccordions.includes(item.title) && (
+                            <div className="mx-6 mb-2">
+                              {item.subItems.map((subItem, subIndex) => (
+                                <Link
+                                  key={subIndex}
+                                  to={subItem.path}
+                                  onClick={closeAllMenus}
+                                  className="block px-2 py-3 text-gray-600 hover:text-black transition-colors"
+                                >
+                                  <div className="flex items-center relative group">
+                                    <span className="relative inline-block">
+                                      {subItem.label}
+                                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+                                    </span>
+                                  </div>
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                          
+                          {/* DIVIDER LINE */}
+                          <div className="px-6">
+                            <hr className="border-t border-gray-200" />
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          {/* Regular Menu Item */}
+                          <div className="px-6 py-4">
+                            <Link
+                              to={item.path}
+                              onClick={closeAllMenus}
+                              className="block font-medium text-gray-900 hover:text-black transition-colors"
+                            >
+                              <span className="relative inline-block group">
+                                {item.title}
+                                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+                              </span>
+                            </Link>
+                          </div>
+                          
+                          {/* DIVIDER LINE */}
+                          <div className="px-6">
+                            <hr className="border-t border-gray-200" />
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Bottom Menu Items */}
+                <div className="py-4 border-t border-gray-300">
+                  <div className="space-y-0">
+                    {bottomMenuItems.map((item, index) => (
+                      <div key={index} className="relative">
+                        {/* Menu Item */}
+                        <div className="px-6 py-4">
+                          <Link
+                            to={item.path}
+                            onClick={closeAllMenus}
+                            className="block text-gray-700 hover:text-black transition-colors"
+                          >
+                            <span className="relative inline-block group">
+                              {item.title}
+                              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+                            </span>
+                          </Link>
+                        </div>
+                        
+                        {/* DIVIDER LINE (except for last item) */}
+                        {index < bottomMenuItems.length - 1 && (
+                          <div className="px-6">
+                            <hr className="border-t border-gray-200" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Country & Currency Section */}
+                  <div className="mt-4">
+                    <div className="relative">
+                      {/* Content */}
+                      <div className="px-6 py-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <Globe size={18} className="text-gray-500 mr-3" />
+                            <div>
+                              <p className="font-medium text-gray-900">INDIA | INR</p>
+                              <p className="text-sm text-gray-500">Change country/region</p>
+                            </div>
+                          </div>
+                          <span className="text-2xl">🌍</span>
+                        </div>
+                      </div>
+                      
+                      {/* DIVIDER LINE (last line) */}
+                      <div className="px-6">
+                        <hr className="border-t border-gray-200" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </header>
+  );
+}
