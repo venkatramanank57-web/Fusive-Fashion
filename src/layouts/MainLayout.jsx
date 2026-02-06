@@ -1,9 +1,5 @@
 // =====================================
 // src/layouts/MainLayout.jsx
-// PURPOSE:
-// - Global layout wrapper
-// - Controls page structure order
-// - Includes cookie consent banner
 // =====================================
 
 import { Outlet } from "react-router-dom";
@@ -18,10 +14,10 @@ export default function MainLayout() {
       <AnnouncementBar />
       <Header />
       <main className="flex-1">
-        <Outlet />
+        <Outlet /> {/* Page content render aagum */}
       </main>
+      <Footer /> 
       <CookieConsent />
-      <Footer />
     </div>
   );
 }
