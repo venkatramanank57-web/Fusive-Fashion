@@ -39,6 +39,7 @@ import Register from "../pages/Register";
 import Account from "../pages/Account";
 import Orders from "../pages/Orders";
 import OrderSuccess from "../pages/OrderSuccess";
+import Testpage from "../pages//testpage"
 
 // Policy Pages
 import PoliciesPage from "../pages/PrivacyPolicy";
@@ -84,6 +85,7 @@ export default function AppRoutes() {
           {/* Order Success */}
           <Route path="/success" element={<OrderSuccess />} />
           <Route path="/order-success" element={<OrderSuccess />} />
+          <Route path="/test" element={< Testpage/>} />
 
           {/* 404 - Not Found */}
           <Route path="*" element={
