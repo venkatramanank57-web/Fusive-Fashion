@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { GET_COLLECTION_BY_HANDLE } from "../api/shopify/collectionByHandle";
 
 import ProductCard, { ProductCardSkeleton } from "../components/ProductCard";
-import FilterDrawer from "../components/Filters/FilterDrawer";
+import FilterDrawer from "../components/filters/FilterDrawer";
 import ProductCountToolbar from "../components/Collection/ProductCountToolbar";
 import RichTextNavigationSection from "../components/Collection//RichTextNavigationSection";
 import NewsletterSection from "../components/Home/NewsletterSection";
