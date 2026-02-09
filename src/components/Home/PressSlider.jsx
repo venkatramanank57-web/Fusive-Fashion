@@ -23,44 +23,40 @@ export default function PressSlider() {
   return (
     <section className="bg-[#f1ede9] py-16 lg:py-24 relative z-10">
 
-      {/* LEFT ARROW — SHOW ONLY WHEN POSSIBLE */}
+      {/* LEFT ARROW */}
       {index > 0 && (
         <button
           onClick={prev}
-          className="hidden lg:flex absolute left-6 top-1/2 -translate-y-1/2 
-          p-4 rounded-full bg-white shadow-md hover:scale-110 transition"
+          className="flex absolute left-3 lg:left-6 top-1/2 -translate-y-1/2
+          p-3 lg:p-4 rounded-full bg-white shadow-md hover:scale-110 transition"
         >
-          <ChevronLeft size={24} />
+          <ChevronLeft size={22} />
         </button>
       )}
 
-      {/* RIGHT ARROW — SHOW ONLY WHEN POSSIBLE */}
+      {/* RIGHT ARROW */}
       {index < testimonials.length - 1 && (
         <button
           onClick={next}
-          className="hidden lg:flex absolute right-6 top-1/2 -translate-y-1/2 
-          p-4 rounded-full bg-white shadow-md hover:scale-110 transition"
+          className="flex absolute right-3 lg:right-6 top-1/2 -translate-y-1/2
+          p-3 lg:p-4 rounded-full bg-white shadow-md hover:scale-110 transition"
         >
-          <ChevronRight size={24} />
+          <ChevronRight size={22} />
         </button>
       )}
 
       {/* CONTENT */}
       <div className="max-w-[900px] mx-auto px-6 text-center">
-
-        {/* LOGO */}
         <img
           src={item.logo}
           alt="press logo"
           className="mx-auto mb-10 w-[120px] lg:w-[160px]"
         />
 
-        {/* QUOTE */}
         <p className="text-[20px] lg:text-[26px] leading-relaxed text-[#2b2b2b] font-light max-w-[700px] mx-auto">
           {item.text}
         </p>
 
-        {/* DOTS */}
         <div className="flex justify-center mt-10 gap-3">
           {testimonials.map((_, i) => (
             <button
