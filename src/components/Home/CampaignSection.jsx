@@ -42,7 +42,7 @@ export default function CampaignSection() {
   };
 
   return (
-    <section className="bg-white pt-20 pb-24">
+    <section className="bg-white pt-20 pb-24 relative z-10">
 
       {/* HEADINGS */}
       <p className="text-center text-xs tracking-[0.4em] text-gray-500 mb-3">

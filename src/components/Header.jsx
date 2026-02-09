@@ -2,7 +2,7 @@
 // src/components/Header.jsx
 // =====================================
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { ShoppingBag, User, Menu, X, Search, Heart, Plus, Minus, Globe, ChevronRight } from "lucide-react";
@@ -13,6 +13,11 @@ export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [openAccordions, setOpenAccordions] = useState([]);
+  
+  // NEW: State for scroll behavior
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [isAtTop, setIsAtTop] = useState(true);
 
   // Get cart items count from Redux store
   const cartCount = useSelector((state) => state.cart.items.length);
@@ -25,6 +30,68 @@ export default function Header() {
   const token = useSelector((state) => state.customer.token);
 
   const navigate = useNavigate();
+
+  // NEW: Refs to track if menus are open
+  const isMenuOpenRef = useRef(false);
+
+  // Update ref when any menu opens
+  useEffect(() => {
+    isMenuOpenRef.current = isMobileMenuOpen || isDesktopMenuOpen || isSearchOpen;
+  }, [isMobileMenuOpen, isDesktopMenuOpen, isSearchOpen]);
+
+  // NEW: Scroll handling effect
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const scrollingUp = currentScrollY < lastScrollY;
+      const scrolledPastThreshold = currentScrollY > 100;
+      
+      // Check if at top of page (for announcement bar compatibility)
+      setIsAtTop(currentScrollY <= 10);
+
+      // Don't hide/show header when menus are open
+      if (isMenuOpenRef.current) {
+        setLastScrollY(currentScrollY);
+        return;
+      }
+
+      // Always show header when scrolling up
+      if (scrollingUp) {
+        setIsVisible(true);
+      }
+      // Hide header when scrolling down past threshold
+      else if (scrolledPastThreshold && !scrollingUp) {
+        setIsVisible(false);
+      }
+      // Show header when at top of page
+      else if (currentScrollY <= 10) {
+        setIsVisible(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    // Throttle scroll events for better performance
+    let ticking = false;
+    const throttledScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', throttledScroll, { passive: true });
+    
+    // Initial check for announcement bar
+    setIsAtTop(window.scrollY <= 10);
+    
+    return () => {
+      window.removeEventListener('scroll', throttledScroll);
+    };
+  }, [lastScrollY]);
 
   // Menu items structure
   const menuItems = [
@@ -117,6 +184,7 @@ export default function Header() {
   const closeAllMenus = () => {
     setIsMobileMenuOpen(false);
     setIsDesktopMenuOpen(false);
+    setIsSearchOpen(false);
     setOpenAccordions([]);
   };
 
@@ -134,7 +202,9 @@ export default function Header() {
   }, [isDesktopMenuOpen]);
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
+    <header className={`sticky top-0 z-50 bg-white border-b border-gray-100 transition-transform duration-300 ease-in-out ${
+      isVisible ? 'translate-y-0' : '-translate-y-full'
+    }`}>
     
 
       {/* Main Header */}
@@ -330,16 +400,12 @@ export default function Header() {
         {/* DESKTOP MENU DRAWER (Left Side - Divided Navigation) */}
         {isDesktopMenuOpen && (
           <>
-            {/* Backdrop Overlay */}
-            <div 
-              className="fixed inset-0 bg-black bg-opacity-30 z-40 transition-opacity duration-300"
-              onClick={closeAllMenus}
-            />
+            {/* Backdrop Overlay - REMOVED COMPLETELY, NO BACKGROUND NEEDED */}
             
-            {/* Drawer Menu - INCREASED WIDTH */}
+            {/* Drawer Menu - KEPT ORIGINAL WIDTH FOR DESKTOP */}
             <div className="desktop-menu-drawer fixed inset-y-0 left-0 w-96 bg-white z-50 transform transition-transform duration-300 ease-in-out shadow-2xl">
               {/* Drawer Header with FULL WIDTH border bottom */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-300">
+              <div className="flex items-center justify-between pt-6 border-b border-gray-300">
                 <span className="text-xl font-bold text-gray-900">Fusive Fashion</span>
                 <button
                   onClick={closeAllMenus}
@@ -350,7 +416,7 @@ export default function Header() {
               </div>
 
               {/* Scrollable Menu Content */}
-              <div className="h-[calc(100vh-73px)] overflow-y-auto">
+              <div className="h-[calc(100vh-73px)] overflow-y-auto bg-white">
                 {/* Main Menu Items with Divided Lines */}
                 <div className="py-4">
                   {menuItems.map((item, index) => (
@@ -492,16 +558,12 @@ export default function Header() {
         {/* MOBILE MENU DRAWER */}
         {isMobileMenuOpen && (
           <>
-            {/* Backdrop Overlay */}
-            <div 
-              className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden transition-opacity duration-300"
-              onClick={closeAllMenus}
-            />
+            {/* REMOVED BACKDROP OVERLAY COMPLETELY - NO TRANSPARENCY */}
             
-            {/* Drawer Menu - INCREASED WIDTH */}
-            <div className="fixed inset-y-0 left-0 w-96 bg-white z-50 lg:hidden transform transition-transform duration-300 ease-in-out">
+            {/* Drawer Menu - FULL WIDTH FOR MOBILE */}
+            <div className="fixed inset-0 bg-white z-50 lg:hidden">
               {/* Drawer Header with FULL WIDTH border bottom */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-300">
+              <div className="flex items-center justify-between pt-6 border-b border-gray-300">
                 <span className="text-xl font-bold text-gray-900">Fusive Fashion</span>
                 <button
                   onClick={closeAllMenus}
@@ -512,7 +574,7 @@ export default function Header() {
               </div>
 
               {/* Scrollable Menu Content */}
-              <div className="h-[calc(100vh-73px)] overflow-y-auto">
+              <div className="h-[calc(100vh-73px)] overflow-y-auto  bg-white">
                 {/* Main Menu Items */}
                 <div className="py-4">
                   {menuItems.map((item, index) => (

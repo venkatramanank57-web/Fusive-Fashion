@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { Play, Pause, ChevronRight, ShoppingBag } from "lucide-react";
+import { Play, Pause, ChevronRight, ShoppingBag, ChevronLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@apollo/client/react";
 import { useDispatch } from "react-redux";
@@ -55,6 +55,11 @@ export default function ShoppableVideo() {
     setVisibleCards((prev) => (prev < products.length ? prev + 1 : prev));
   };
 
+  /* PREVIOUS CARD */
+  const showPreviousCard = () => {
+    setVisibleCards((prev) => (prev > 1 ? prev - 1 : prev));
+  };
+
   /* AUTO REVEAL */
   useEffect(() => {
     const interval = setInterval(() => {
@@ -66,7 +71,7 @@ export default function ShoppableVideo() {
   if (loading) return null;
 
   return (
-    <section className="relative w-full h-[520px] md:h-[760px] overflow-hidden">
+    <section className="relative w-full h-[520px] md:h-[760px] overflow-hidden z-10">
 
       {/* VIDEO */}
       <video
@@ -136,20 +141,43 @@ export default function ShoppableVideo() {
                   />
                 </button>
 
-                {/* NEXT */}
-                {i === visibleCards - 1 && visibleCards < products.length && (
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      showNextCard();
-                    }}
-                    className="group w-9 h-9 md:w-10 md:h-10 bg-white hover:bg-black transition flex items-center justify-center shadow"
-                  >
-                    <ChevronRight
-                      size={18}
-                      className="text-black group-hover:text-white transition"
-                    />
-                  </button>
+                {/* NAVIGATION BUTTONS */}
+                {i === visibleCards - 1 && (
+                  <div className="flex flex-col gap-2">
+                    {/* PREVIOUS BUTTON - Show if not on first card */}
+                    {visibleCards > 1 && (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          showPreviousCard();
+                        }}
+                        className="group w-9 h-9 md:w-10 md:h-10 bg-white hover:bg-black transition flex items-center justify-center shadow rotate-180"
+                      >
+                        <ChevronRight
+                          size={18}
+                          className="text-black group-hover:text-white transition"
+                        />
+                      </button>
+                    )}
+                    
+                    {/* NEXT BUTTON - Always show if there are more cards */}
+                    {visibleCards < products.length && (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          showNextCard();
+                        }}
+                        className="group w-9 h-9 md:w-10 md:h-10 bg-white hover:bg-black transition flex items-center justify-center shadow"
+                      >
+                        <ChevronRight
+                          size={18}
+                          className="text-black group-hover:text-white transition"
+                        />
+                      </button>
+                    )}
+                  </div>
                 )}
 
               </div>

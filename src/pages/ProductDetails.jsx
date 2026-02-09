@@ -473,7 +473,7 @@ export default function ProductDetails() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen bg-white">
+    <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen bg-white z-10">
       {/* Toast Notification */}
       <Toast 
         show={toast.show} 
@@ -486,7 +486,7 @@ export default function ProductDetails() {
       <ProductMedia media={filteredMedia} />
 
       {/* Right Column - Product Details */}
-      <div className="p-4 lg:p-8">
+      <div className="p-4 lg:p-8 z-10 bg-white ">
         <div className="max-w-lg mx-auto">
           {/* Top Actions Row */}
           <div className="flex items-center justify-between mb-4">

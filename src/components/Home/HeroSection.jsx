@@ -57,7 +57,7 @@ export default function HeroSection() {
   // ⭐ MOBILE HERO (normal section)
   if (isMobile) {
     return (
-      <section className="relative h-screen w-full overflow-hidden">
+      <section className="relative h-screen w-full overflow-hidden z-10">
         <img
           src="//wonder-theme-fashion.myshopify.com/cdn/shop/files/3-velour-mobile-banner-main.jpg?v=1763505144&width=2000"
           className="absolute inset-0 w-full h-full object-cover"
@@ -122,8 +122,8 @@ export default function HeroSection() {
           </h1>
         </div>
 
-        {/* TEXT */}
-        <div className="absolute inset-0 flex items-end justify-center pb-24 px-4">
+        {/* TEXT & BUTTON - ADJUSTED: Changed pb-24 to pb-32 for lower button position */}
+        <div className="absolute inset-0 flex items-end justify-center pb-32 px-4">
           <div className="text-center max-w-3xl">
             <p className="text-white text-sm uppercase tracking-[0.3em] mb-6">
               Redefine Your Elegance

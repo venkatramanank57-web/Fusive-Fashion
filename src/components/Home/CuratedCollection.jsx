@@ -44,7 +44,7 @@ export default function CuratedCollection() {
   };
 
   return (
-    <section className="bg-[#f1f1f1] py-16 md:py-24">
+    <section className="bg-[#f1f1f1] py-16 md:py-24 relative z-10">
       <div className="max-w-7xl mx-auto px-6">
 
         {/* ⭐ HEADING UPDATED */}

@@ -104,7 +104,7 @@ export default function ParallaxSaleSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-[300vh] bg-[#f4f0eb]"
+      className="relative min-h-[300vh] bg-[#f4f0eb] z-10"
     >
       {/* Sticky Text */}
       <div className="sticky top-0 h-screen flex items-center justify-center z-10">

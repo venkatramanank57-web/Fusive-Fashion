@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export default function SplitImageVideoSection() {
   return (
-    <section className="w-full bg-[#f4f0eb]">
+    <section className="w-full bg-[#f4f0eb] relative z-10">
       <div className="mx-auto max-w-[1600px] grid grid-cols-1 md:grid-cols-2 min-h-screen">
 
         {/* LEFT: IMAGE + TEXT */}

@@ -138,7 +138,7 @@ export default function ProductMedia({ media = [] }) {
       {/* Main Media Display with Vertical Scroll */}
       <div 
         ref={containerRef}
-        className="relative h-screen bg-gray-50 overflow-y-auto snap-y snap-mandatory scrollbar-hide"
+        className="sticky top-0 h-screen overflow-y-auto snap-y snap-mandatory scrollbar-hide z-10 bg-white"
       >
         {/* Black Vertical Thumbnail Bar (ALWAYS VISIBLE) */}
         {validMedia.length > 1 && (

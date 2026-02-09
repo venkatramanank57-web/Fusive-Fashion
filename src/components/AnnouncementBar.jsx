@@ -1,53 +1,77 @@
 // =====================================
-// src/components/AnnouncementBar.jsx
-// PURPOSE:
-// - Top announcement bar
-// - Black background, white text
-// - Marquee scrolling text
-// - Close (X) button on RIGHT side
-// - Tailwind CSS ONLY
+// src/components/AnnouncementBar.jsx (ALWAYS SHOW ON RELOAD)
 // =====================================
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 
 export default function AnnouncementBar() {
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(true); // ALWAYS start as true
 
-  if (!visible) return null;
+  useEffect(() => {
+    console.log("AnnouncementBar mounted on page load/reload");
+    
+    // IGNORE sessionStorage - always show on load
+    // Delete any existing session storage to prevent future issues
+    sessionStorage.removeItem("announcementClosed");
+    
+    // Force set to true (just in case)
+    setVisible(true);
+  }, []);
+
+  const closeBar = () => {
+    console.log("User closed announcement bar");
+    setVisible(false);
+    
+    // Still store in sessionStorage so it stays closed
+    // during current page navigation (not on reload)
+    sessionStorage.setItem("announcementClosed", "true");
+  };
+
+  // Reset on page reload
+  useEffect(() => {
+    // This will run before page unload/reload
+    const handleBeforeUnload = () => {
+      sessionStorage.removeItem("announcementClosed");
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
+  if (!visible) {
+    console.log("AnnouncementBar not showing (user closed it)");
+    return null;
+  }
+
+  console.log("AnnouncementBar is VISIBLE and rendering");
 
   return (
-    <div className="relative w-full overflow-hidden bg-black text-white border-b border-white/10 py-2 z-40">
-      {/* Marquee Container */}
+    <div className="relative w-full overflow-hidden bg-black text-white border-b border-white/10 py-2">
       <div className="flex whitespace-nowrap">
-        {/* Animated marquee content */}
         <div className="animate-marquee flex items-center">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="flex items-center mx-8">
-              <a
-                href="#"
-                className="font-medium hover:underline whitespace-nowrap"
-              >
+              <span className="font-medium">
                 Black Friday Sale →
-              </a>
-              <span className="mx-8 opacity-90 whitespace-nowrap">
+              </span>
+              <span className="mx-8 opacity-90">
                 Free returns within 30 days
               </span>
             </div>
           ))}
         </div>
-        
-        {/* Duplicate for seamless loop */}
+
         <div className="animate-marquee flex items-center" aria-hidden="true">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="flex items-center mx-8">
-              <a
-                href="#"
-                className="font-medium hover:underline whitespace-nowrap"
-              >
+              <span className="font-medium">
                 Black Friday Sale →
-              </a>
-              <span className="mx-8 opacity-90 whitespace-nowrap">
+              </span>
+              <span className="mx-8 opacity-90">
                 Free returns within 30 days
               </span>
             </div>
@@ -55,10 +79,9 @@ export default function AnnouncementBar() {
         </div>
       </div>
 
-      {/* Close Button - RIGHT SIDE */}
       <button
-        onClick={() => setVisible(false)}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-1 text-white hover:bg-white/10 rounded-md transition-colors"
+        onClick={closeBar}
+        className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-white hover:bg-white/10 rounded-md"
         aria-label="Close announcement"
       >
         <X size={18} />

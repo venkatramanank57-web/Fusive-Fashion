@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export default function FeaturedCollections() {
   return (
-    <section className="w-full">
+    <section className="w-full  relative z-10">
       {/* GRID */}
       <div className="grid grid-cols-1 md:grid-cols-2 w-full">
 

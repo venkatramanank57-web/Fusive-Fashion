@@ -8,6 +8,12 @@ import CampaignSection from "../components/Home/CampaignSection";
 import ParallaxSaleSection from "../components/Home/ParallaxSaleSection";
 import SplitImageVideoSection from "../components/Home/SplitImageVideoSection";
 import InspirationReels from "../components/Home/InspirationReels";
+import BrandsMarquee from "../components/Home/BrandsMarquee";
+import JournalSection from "../components/Home/JournalSection";
+import PressSlider from "../components/Home/PressSlider";
+import InstagramSection from "../components/Home/InstagramSection";
+import FeaturesBanner from "../components/Home/FeaturesBanner";
+import NewsletterSection from "../components/Home/NewsletterSection";
 
 function Home() {
   return (
@@ -22,6 +28,12 @@ function Home() {
       <ParallaxSaleSection/>  {/* slide-7 */}
       <SplitImageVideoSection/>{/* slide-8 */}
       <InspirationReels/>     {/* slide-9 */}
+      <BrandsMarquee/>        {/* slide-10 */}
+      <JournalSection/>       {/* slide-11 */}
+      <PressSlider/>          {/* slide-12 */}
+      <InstagramSection/>     {/* slide-13 */}
+      <FeaturesBanner/>       {/* slide-14 */}
+      <NewsletterSection/>    {/* slide-15 */}
 
     </>
   );
