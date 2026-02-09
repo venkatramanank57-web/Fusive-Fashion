@@ -1,4 +1,4 @@
-import CollectionSlider from "../Common/CollectionSlider";
+import CollectionSlider from "../common/CollectionSlider";
 import {GET_PRODUCTS } from "../../api/shopify/products";
 
 export default function HandbagDealsProducts() {
