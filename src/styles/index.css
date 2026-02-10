@@ -216,3 +216,22 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
+
+.swiper-button-prev,
+.swiper-button-next {
+  color: black !important;
+  transform: scale(0.6);
+}
+
+.swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  border: 1px solid black;
+  background: transparent;
+  opacity: 1;
+}
+
+.swiper-pagination-bullet-active {
+  background: black;
+}
+

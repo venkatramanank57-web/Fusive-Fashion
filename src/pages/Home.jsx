@@ -6,14 +6,14 @@ import CuratedCollection from "../components/Home/CuratedCollection";
 import ShoppableVideo from "../components/Home/ShoppableVideo";
 import CampaignSection from "../components/Home/CampaignSection";
 import ParallaxSaleSection from "../components/Home/ParallaxSaleSection";
-import SplitImageVideoSection from "../components/Home/SplitImageVideoSection";
+import SplitImageVideoSection from "../components/common/SplitImageVideoSection";
 import InspirationReels from "../components/Home/InspirationReels";
-import BrandsMarquee from "../components/Home/BrandsMarquee";
+import BrandsMarquee from "../components/common/BrandsMarquee";
 import JournalSection from "../components/Home/JournalSection";
 import PressSlider from "../components/Home/PressSlider";
 import InstagramSection from "../components/Home/InstagramSection";
-import FeaturesBanner from "../components/Home/FeaturesBanner";
-import NewsletterSection from "../components/Home/NewsletterSection";
+import FeaturesBanner from "../components/common/FeaturesBanner";
+import NewsletterSection from "../components/common/NewsletterSection";
 
 function Home() {
   return (

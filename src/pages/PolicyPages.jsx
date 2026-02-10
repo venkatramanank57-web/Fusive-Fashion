@@ -28,25 +28,11 @@ export default function PoliciesPage() {
   const [policy, setPolicy] = useState(null);
   const [shopInfo, setShopInfo] = useState(null);
   
-  // Debug logging
-  useEffect(() => {
-    console.log("🔍 Policies Page Debug:");
-    console.log("Domain:", import.meta.env.VITE_SHOPIFY_DOMAIN);
-    console.log("Token exists:", !!import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN);
-    console.log("Policy type:", type);
-  }, []);
-
   // Apollo query for Shopify data
   const { data, loading, error } = useQuery(GET_SHOP_POLICIES, {
     fetchPolicy: 'network-only',
-    onCompleted: (data) => {
-      console.log("✅ Shopify API Response:", data);
-    },
-    onError: (error) => {
-      console.error("❌ Shopify API Error:", error);
-    }
   });
-
+  
   // Policy configuration
   const policyConfig = {
     privacy: {
@@ -332,15 +318,12 @@ export default function PoliciesPage() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center relative z-10">
         <div className="text-center">
           <div className="inline-flex items-center justify-center">
             <Loader2 className="h-8 w-8 text-baltic animate-spin mr-3" />
-            <span className="text-gray-600">Loading policy from Shopify...</span>
+            <span className="text-gray-600">Loading policy...</span>
           </div>
-          <p className="text-sm text-gray-500 mt-2">
-            Fetching from: {import.meta.env.VITE_SHOPIFY_DOMAIN}
-          </p>
         </div>
       </div>
     );
@@ -349,7 +332,7 @@ export default function PoliciesPage() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 relative z-10">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
           <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="h-6 w-6 text-red-600" />
@@ -388,7 +371,7 @@ export default function PoliciesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 z-10 relative">
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -455,9 +438,6 @@ export default function PoliciesPage() {
                       <CheckCircle size={14} />
                       Connected to Shopify
                     </div>
-                    <p className="text-xs text-gray-500">
-                      API: {import.meta.env.VITE_SHOPIFY_API_VERSION}
-                    </p>
                   </div>
                 </div>
               ) : (
@@ -514,7 +494,7 @@ export default function PoliciesPage() {
                   />
                 )}
 
-                {/* Source Info */}
+                {/* Source Info
                 <div className="mt-8 pt-6 border-t">
                   <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
                     <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -541,7 +521,7 @@ export default function PoliciesPage() {
                       </a>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
 
               {/* Quick Actions */}

@@ -7,7 +7,9 @@ import ProductCard, { ProductCardSkeleton } from "../components/ProductCard";
 import FilterDrawer from "../components/filters/FilterDrawer";
 import ProductCountToolbar from "../components/Collection/ProductCountToolbar";
 import RichTextNavigationSection from "../components/Collection//RichTextNavigationSection";
-import NewsletterSection from "../components/Home/NewsletterSection";
+import NewsletterSection from "../components/common/NewsletterSection";
+import FeaturesBanner from "../components/common/FeaturesBanner";
+import ProductDetailsSkeleton from "../components/ProductGridSkeleton"
 
 export default function CollectionPage() {
   const { handle } = useParams();
@@ -358,6 +360,7 @@ export default function CollectionPage() {
             <div className="col-span-full text-center py-20">
               <p className="text-red-600">Error loading products</p>
               <p className="text-gray-500 mt-2">{error.message}</p>
+             
             </div>
           )}
 
@@ -388,10 +391,10 @@ export default function CollectionPage() {
       </div>
 
       {/* ⭐ BOTTOM COLLECTION NAVIGATION */}
-      <RichTextNavigationSection />
+      <RichTextNavigationSection />      {/* slide-3 */}
+      <FeaturesBanner/>                  {/* slide-4 */}
 
-
-      <NewsletterSection/> 
+      <NewsletterSection/>               {/* slide-5 */}
 
     </div>
   );

@@ -32,13 +32,14 @@ import Checkout from "../pages/Checkout";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Account from "../pages/Account";
+import About from "../pages/About";
 import Lookbook from "../pages/Lookbook";
 import Orders from "../pages/Orders";
 import OrderSuccess from "../pages/OrderSuccess";
 import Testpage from "../pages/testpage";
 
 // Policy Pages
-import PoliciesPage from "../pages/PrivacyPolicy";
+import PoliciesPage from "../pages/PolicyPages";
 import ContactPage from "../pages/ContactPage";
 
 // Route protection
@@ -57,10 +58,10 @@ export default function AppRoutes() {
           {/* HOME */}
           <Route path="/" element={<Home />} />
 
-          {/* ⭐ SALE PAGE ROUTES
+          {/* ⭐ SALE PAGE ROUTES */}
           <Route path="/collections/sale" element={<Sale />} />
           <Route path="/sale" element={<Navigate to="/collections/sale" replace />} />
-          <Route path="/collections/:handle" element={<CollectionPage />} /> */}
+          <Route path="/collections/:handle" element={<CollectionPage />} />
 
 
           {/*showing all collection*/}
@@ -79,15 +80,19 @@ export default function AppRoutes() {
           {/* look book page */}
           {/* <Route path="/lookbook" element={<Lookbook />} />  */}
 
+          {/*About us page */}
+          {/* <Route path="/about" element={<About />} /> */}
+
+
 
           {/* AUTH */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          {/* <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} /> */}
 
           {/* POLICIES */}
-          <Route path="/policy/:type" element={<PoliciesPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-
+          {/* <Route path="/policy/:type" element={<PoliciesPage />} />
+          <Route path="/contact" element={<ContactPage />} /> */}
+{/* 
           <Route
             path="/privacy-policy"
             element={<Navigate to="/policy/privacy" replace />}
@@ -107,7 +112,7 @@ export default function AppRoutes() {
           <Route
             path="/return-policy"
             element={<Navigate to="/policy/refund" replace />}
-          />
+          /> */}
 
           {/* PROTECTED */}
           <Route element={<ProtectedRoutes />}>
@@ -121,7 +126,7 @@ export default function AppRoutes() {
           <Route path="/test" element={<Testpage />} />
 
           
-          <Route
+          {/* <Route
             path="*"
             element={
               <div className="min-h-screen flex items-center justify-center relative z-10 bg-white" >
@@ -134,11 +139,11 @@ export default function AppRoutes() {
                 </div>
               </div>
             }
-          />
+          /> */}
 
           {/* Not found page */}
           {/* ⭐ 404 LAST */}
-          {/* <Route path="*" element={<NotFound />} /> */}
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
     </>

@@ -154,7 +154,7 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 z-10 relative">
       <Toast 
         show={toast.show} 
         message={toast.message} 

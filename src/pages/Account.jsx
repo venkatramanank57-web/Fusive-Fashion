@@ -217,7 +217,7 @@ export default function Account() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 z-10 relative">
       <Toast 
         show={toast.show} 
         message={toast.message} 

@@ -60,10 +60,10 @@ export default function Footer() {
       title: "Information",
       links: [
         { label: "About Us", path: "/about" },
-        { label: "Return and Refunds", path: "/returns" },
-        { label: "Legal Area", path: "/legal" },
-        { label: "Privacy Policy", path: "/privacy" },
-        { label: "Terms of Service", path: "/terms" },
+        { label: "Return and Refunds", path: "/policy/refund" },
+        { label: "Legal Area", path: "/policy/legal" },
+        { label: "Privacy Policy", path: "/policy/privacy" },
+        { label: "Terms of Service", path: "/policy/terms" },
       ],
     },
     {
@@ -92,33 +92,31 @@ export default function Footer() {
     { icon: Pin, href: "#" },
   ];
 
-const paymentMethods = [
-  {
-    src: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg",
-    alt: "Visa",
-  },
-  {
-    src: "https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg",
-    alt: "Mastercard",
-  },
-  {
-    src: "https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg",
-    alt: "American Express",
-  },
-  {
-    src: "https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg",
-    alt: "PayPal",
-  },
-  {
-    src: "https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/discover.svg",
-    alt: "Discover",
-  },
-];
-
+  const paymentMethods = [
+    {
+      src: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg",
+      alt: "Visa",
+    },
+    {
+      src: "https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg",
+      alt: "Mastercard",
+    },
+    {
+      src: "https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg",
+      alt: "American Express",
+    },
+    {
+      src: "https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg",
+      alt: "PayPal",
+    },
+    {
+      src: "https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/discover.svg",
+      alt: "Discover",
+    },
+  ];
 
   return (
     <footer className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 z-9 ">
-
       {/* ================= MOBILE ================= */}
       <div className="md:hidden">
         <div className="px-4 py-4 border-b flex justify-end">

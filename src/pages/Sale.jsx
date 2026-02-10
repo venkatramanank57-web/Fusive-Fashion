@@ -7,7 +7,7 @@ import BagsSaleBanner from "../components/Sale/BagsSaleBanner";
 import HandbagDealsProducts from "../components/Sale/HandbagDealsProducts";
 import TestimonialsSlider from "../components/Sale/TestimonialsSlider";
 import RichTextNavigationSection from "../components/Sale/RichTextNavigationSection";
-import NewsletterSection from "../components/Home/NewsletterSection";
+import NewsletterSection from "../components/common/NewsletterSection";
 
 export default function Sale() {
   return (

@@ -4,28 +4,28 @@ export default function CollectionsImageGrid() {
 
   const collections = [
     {
-      title: "Dress",
-      path: "/collections/dress",
+      title: "Denim",
+      path: "/collections/denim",
       img: "https://wonder-theme-fashion.myshopify.com/cdn/shop/files/1-fashion.jpg?v=1698083750"
     },
     {
-      title: "Blazers",
-      path: "/collections/blazer",
+      title: "Printed",
+      path: "/collections/Printed",
       img: "https://wonder-theme-fashion.myshopify.com/cdn/shop/files/2-fashion.jpg?v=1698083750"
     },
     {
-      title: "Trousers",
-      path: "/collections/trousers",
+      title: "Solids",
+      path: "/collections/Solids",
       img: "https://wonder-theme-fashion.myshopify.com/cdn/shop/files/3-fashion.jpg?v=1698083750"
     },
     {
-      title: "Jumpers",
-      path: "/collections/jumpers",
+      title: "Bodycon",
+      path: "/collections/bodycon",
       img: "https://wonder-theme-fashion.myshopify.com/cdn/shop/files/4-fashion.jpg?v=1698086261"
     },
     {
-      title: "Skirt",
-      path: "/collections/skirt",
+      title: "New-arrivals",
+      path: "collections/new-arrivals",
       img: "https://wonder-theme-fashion.myshopify.com/cdn/shop/files/6b-fashion.jpg?v=1698087992"
     },
     {

@@ -1,7 +1,8 @@
 import CollectionsHero from "../components/ShopByCollections/CollectionsHero";
 import CollectionsImageGrid from "../components/ShopByCollections/CollectionsImageGrid";
 import Bestseller from "../components/Home/Bestseller";
-import NewsletterSection from "../components/Home/NewsletterSection";
+import FeaturesBanner from "../components/common/FeaturesBanner";
+import NewsletterSection from "../components/common/NewsletterSection";
 
 
 export default function ShopByCollections() {
@@ -12,7 +13,8 @@ export default function ShopByCollections() {
       <CollectionsHero />    {/* ⭐ HERO (Shopify style) */}
       <CollectionsImageGrid />   {/*slide-2*/}
       <Bestseller />             {/* slide-3 */}
-      <NewsletterSection/>       {/* slide-4 */}
+      <FeaturesBanner/>          {/* slide-4 */}
+      <NewsletterSection/>       {/* slide-5 */}
 
       
 

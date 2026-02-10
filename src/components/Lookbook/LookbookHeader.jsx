@@ -1,6 +1,6 @@
 export default function LookbookHeader() {
   return (
-    <section className="bg-white pt-16 md:pt-20 pb-6 text-center">
+    <section className="bg-white pt-16 md:pt-20 pb-6 text-center z-10">
       
       <div className="max-w-3xl mx-auto px-6">
 
