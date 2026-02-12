@@ -259,7 +259,7 @@ export default function CartPage() {
   // Empty cart state
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="min-h-screen bg-gray-50 py-12 px-4 z-10 relative">
         <Toast 
           show={toast.show} 
           message={toast.message} 
@@ -290,7 +290,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="min-h-screen bg-gray-50 py-12 px-4 z-10 relative">
       <Toast 
         show={toast.show} 
         message={toast.message} 

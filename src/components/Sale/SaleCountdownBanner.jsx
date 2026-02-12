@@ -37,7 +37,7 @@ export default function SaleCountdownBanner() {
       </div>
 
       {/* RIGHT CONTENT */}
-      <div className="bg-[#141931] text-white flex items-center justify-center text-center px-6 pt-10 md:py-0 ">
+      <div className="bg-[#141931] text-white flex items-center justify-center text-center px-6 py-10 md:py-0 ">
         <div className="max-w-md">
 
           <h2 className="text-4xl md:text-6xl font-light mb-4">

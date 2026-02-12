@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useSearch } from "./context/SearchContext";
 import SearchOverlay from "./components/Search/SearchOverlay";
 import AppRoutes from "./routes/AppRoutes";
-import { Toaster } from "react-hot-toast";
+// Remove this line: import { Toaster } from "react-hot-toast";
 
 // Wrapper component to provide navigate
 function SearchOverlayWrapper() {
@@ -28,7 +28,7 @@ function SearchOverlayWrapper() {
 export default function App() {
   return (
     <>
-      <Toaster position="top-right" />
+      {/* Remove this line: <Toaster position="top-right" /> */}
       <AppRoutes />
       <SearchOverlayWrapper />
     </>

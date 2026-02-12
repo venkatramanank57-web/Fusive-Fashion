@@ -28,7 +28,7 @@ export default function ParallaxSaleSection() {
 
       // SEQUENTIAL WINDOWS
       const leftStart = 0.15;
-      const leftEnd = 0.45;
+      const leftEnd = 0.95;
 
       const rightStart = 0.45;
       const rightEnd = 0.75;
@@ -36,7 +36,7 @@ export default function ParallaxSaleSection() {
       // MOTION TUNING (THIS IS THE MAGIC)
       const travelY = sectionH * 0.6; // vertical
       const travelX = 40;             // zig-zag drift
-      const rotateDeg = 8;             // tilt amount
+      const rotateDeg = 16;             // tilt amount
 
       // ---------- LEFT IMAGE ----------
       if (progress < leftStart) {

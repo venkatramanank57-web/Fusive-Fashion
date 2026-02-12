@@ -116,7 +116,7 @@ export default function WishlistPage() {
   // Empty wishlist state
   if (validWishlistItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="min-h-screen bg-gray-50 py-12 px-4 z-10 relative">
         {/* Toast Notification */}
         <Toast 
           show={toast.show} 

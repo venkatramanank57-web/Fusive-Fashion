@@ -199,7 +199,7 @@ export default function Header() {
   return (
     <>
       {/* 🔥 HEADER - stays at top */}
-      <header className={`sticky top-0 z-20 bg-white border-b border-gray-100 transition-transform duration-300 ease-in-out ${
+      <header className={`sticky top-0 z-50 bg-white border-b border-gray-100 transition-transform duration-300 ease-in-out ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}>
       
@@ -318,13 +318,13 @@ export default function Header() {
                   <span className="text-xs text-gray-500">▼</span>
                 </div>
 
-                <button
+                {/* <button
                   onClick={handleSearchClick} // 👈 UPDATED
                   className="p-2 rounded-full text-gray-700 hover:text-black"
                   aria-label="Search"
                 >
                   <Search size={20} />
-                </button>
+                </button> */}
 
                 <button
                   onClick={() => navigate("/wishlist")}

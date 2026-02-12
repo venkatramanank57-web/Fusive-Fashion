@@ -63,7 +63,7 @@ export default function AppRoutes() {
           {/* ⭐ SALE PAGE ROUTES */}
           <Route path="/collections/sale" element={<Sale />} />
           {/* <Route path="/sale" element={<Navigate to="/collections/sale" replace />} /> */}
-          {/* <Route path="/collections/:handle" element={<CollectionPage />} /> */}
+          <Route path="/collections/:handle" element={<CollectionPage />} />
 
 
           {/*showing all collection*/}

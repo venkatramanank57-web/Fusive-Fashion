@@ -45,7 +45,7 @@ export default function StickyHeader() {
   }, [lastScrollY]);
 
   return (
-    <div className={`sticky top-0 z-20 transition-transform duration-300 ease-in-out ${
+    <div className={`sticky top-0 z-50 transition-transform duration-300 ease-in-out ${
       isVisible ? 'translate-y-0' : '-translate-y-full'
     }`}>
       <AnnouncementBar />

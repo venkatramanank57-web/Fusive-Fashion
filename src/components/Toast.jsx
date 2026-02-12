@@ -1,9 +1,5 @@
 // =====================================
 // src/components/Toast.jsx
-// PURPOSE:
-// Toast notification component
-// Shows success/error/info messages
-// Auto-dismiss after 3 seconds
 // =====================================
 
 import { CheckCircle, XCircle, Info, X } from "lucide-react";
@@ -35,7 +31,7 @@ export default function Toast({ show, message, type = "success", onClose }) {
   const config = typeConfig[type] || typeConfig.success;
 
   return (
-    <div className="fixed top-4 right-4 z-50 animate-slide-in">
+    <div className="fixed top-38 right-6 z-[9999] animate-slide-in">
       <div className={`${config.bg} ${config.border} border rounded-lg shadow-lg max-w-md`}>
         <div className="flex items-start p-4">
           <div className="flex-shrink-0 mr-3">

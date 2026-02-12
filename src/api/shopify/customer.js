@@ -1,16 +1,18 @@
 // =====================================
 // src/api/shopify/customer.js
 // PURPOSE:
-// This file CONTAINS SHOPIFY CUSTOMER GRAPHQL OPERATIONS.
-// It is used for:
-// - Customer login/registration
-// - Fetching customer profile, orders, addresses
-// - Updating customer information
+// Shopify Storefront Customer GraphQL operations
+// - Authentication (login, register, logout)
+// - Profile management
+// - Orders
+// - Password recovery
 // =====================================
 
 import { gql } from "@apollo/client";
 
-// 1. CUSTOMER LOGIN
+/* ======================================================
+   1. CUSTOMER LOGIN
+   ====================================================== */
 export const CUSTOMER_LOGIN = gql`
   mutation CustomerLogin($input: CustomerAccessTokenCreateInput!) {
     customerAccessTokenCreate(input: $input) {
@@ -26,7 +28,12 @@ export const CUSTOMER_LOGIN = gql`
   }
 `;
 
-// 2. CUSTOMER REGISTRATION
+/* ======================================================
+   2. CUSTOMER REGISTRATION
+   IMPORTANT:
+   Shopify does NOT return accessToken here.
+   You must call CUSTOMER_LOGIN after successful register.
+   ====================================================== */
 export const CUSTOMER_REGISTER = gql`
   mutation CustomerRegister($input: CustomerCreateInput!) {
     customerCreate(input: $input) {
@@ -41,17 +48,15 @@ export const CUSTOMER_REGISTER = gql`
         field
         message
       }
-      customerAccessToken {
-        accessToken
-        expiresAt
-      }
     }
   }
 `;
 
-// 3. GET CUSTOMER PROFILE
+/* ======================================================
+   3. GET CUSTOMER PROFILE
+   ====================================================== */
 export const GET_CUSTOMER_PROFILE = gql`
-  query GetCustomer($customerAccessToken: String!) {
+  query GetCustomerProfile($customerAccessToken: String!) {
     customer(customerAccessToken: $customerAccessToken) {
       id
       firstName
@@ -60,6 +65,7 @@ export const GET_CUSTOMER_PROFILE = gql`
       phone
       acceptsMarketing
       createdAt
+
       defaultAddress {
         id
         name
@@ -71,6 +77,7 @@ export const GET_CUSTOMER_PROFILE = gql`
         zip
         phone
       }
+
       addresses(first: 10) {
         edges {
           node {
@@ -90,7 +97,9 @@ export const GET_CUSTOMER_PROFILE = gql`
   }
 `;
 
-// 4. GET CUSTOMER ORDERS
+/* ======================================================
+   4. GET CUSTOMER ORDERS
+   ====================================================== */
 export const GET_CUSTOMER_ORDERS = gql`
   query GetCustomerOrders($customerAccessToken: String!) {
     customer(customerAccessToken: $customerAccessToken) {
@@ -102,10 +111,12 @@ export const GET_CUSTOMER_ORDERS = gql`
             processedAt
             financialStatus
             fulfillmentStatus
+
             totalPrice {
               amount
               currencyCode
             }
+
             lineItems(first: 5) {
               edges {
                 node {
@@ -126,10 +137,18 @@ export const GET_CUSTOMER_ORDERS = gql`
   }
 `;
 
-// 5. UPDATE CUSTOMER PROFILE
+/* ======================================================
+   5. UPDATE CUSTOMER PROFILE
+   ====================================================== */
 export const UPDATE_CUSTOMER_PROFILE = gql`
-  mutation UpdateCustomer($customerAccessToken: String!, $customer: CustomerUpdateInput!) {
-    customerUpdate(customerAccessToken: $customerAccessToken, customer: $customer) {
+  mutation UpdateCustomer(
+    $customerAccessToken: String!
+    $customer: CustomerUpdateInput!
+  ) {
+    customerUpdate(
+      customerAccessToken: $customerAccessToken
+      customer: $customer
+    ) {
       customer {
         id
         firstName
@@ -145,7 +164,12 @@ export const UPDATE_CUSTOMER_PROFILE = gql`
   }
 `;
 
-// 6. REQUEST PASSWORD RESET
+/* ======================================================
+   6. REQUEST PASSWORD RESET
+   NOTE:
+   This sends reset email.
+   It does NOT change password directly.
+   ====================================================== */
 export const REQUEST_PASSWORD_RESET = gql`
   mutation CustomerRecover($email: String!) {
     customerRecover(email: $email) {
@@ -157,10 +181,14 @@ export const REQUEST_PASSWORD_RESET = gql`
   }
 `;
 
-// 7. CUSTOMER LOGOUT
+/* ======================================================
+   7. CUSTOMER LOGOUT
+   ====================================================== */
 export const CUSTOMER_LOGOUT = gql`
   mutation CustomerLogout($customerAccessToken: String!) {
-    customerAccessTokenDelete(customerAccessToken: $customerAccessToken) {
+    customerAccessTokenDelete(
+      customerAccessToken: $customerAccessToken
+    ) {
       deletedAccessToken
       deletedCustomerAccessTokenId
       userErrors {
