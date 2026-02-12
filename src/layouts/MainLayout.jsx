@@ -19,7 +19,7 @@ export default function MainLayout() {
       </main> 
 
       {/* Footer ALWAYS after page content   -5 */}
-      <Footer />
+      {/* <Footer /> */}
       <CookieConsent />
     </div>
   );

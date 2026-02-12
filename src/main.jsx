@@ -7,6 +7,7 @@
 // - Redux Persist (save state on refresh)
 // - Apollo Client (Shopify Storefront API)
 // - React Router (page navigation)
+// - Search Context (global search overlay)
 // ================================
 
 import React from "react";
@@ -26,6 +27,9 @@ import { persistStore } from "redux-persist";
 // Apollo Client – connects React app to Shopify Storefront GraphQL API
 import { ApolloProvider } from "@apollo/client/react";
 import client from "./apollo/client";
+
+// 🔥 NEW: Search Context Provider – global search overlay state
+import { SearchProvider } from "./context/SearchContext";
 
 // Root App component
 import App from "./App";
@@ -47,8 +51,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <ApolloProvider client={client}>
           {/* BrowserRouter: enables URL-based navigation */}
           <BrowserRouter>
-            {/* Main App component */}
-            <App />
+            {/* 🔥 NEW: SearchProvider – enables global search overlay */}
+            <SearchProvider>
+              {/* Main App component */}
+              <App />
+            </SearchProvider>
           </BrowserRouter>
         </ApolloProvider>
       </PersistGate>

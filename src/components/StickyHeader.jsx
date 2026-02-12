@@ -1,5 +1,5 @@
 // =====================================
-// src/components/StickyHeader.jsx (SUPER COMPONENT)
+// src/components/StickyHeader.jsx
 // =====================================
 
 import { useState, useEffect } from "react";
@@ -15,16 +15,13 @@ export default function StickyHeader() {
     const controlHeader = () => {
       const currentScrollY = window.scrollY;
       
-      // Show header when scrolling up
       if (currentScrollY < lastScrollY) {
         setIsVisible(true);
       } 
-      // Hide header when scrolling down
       else if (currentScrollY > lastScrollY && currentScrollY > 100) {
         setIsVisible(false);
       }
       
-      // Always show header at top
       if (currentScrollY === 0) {
         setIsVisible(true);
       }
@@ -32,7 +29,6 @@ export default function StickyHeader() {
       setLastScrollY(currentScrollY);
     };
 
-    // Throttle scroll events for better performance
     let ticking = false;
     const handleScroll = () => {
       if (!ticking) {
@@ -45,21 +41,15 @@ export default function StickyHeader() {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
   return (
-    <div className={`sticky top-0 z-50 transition-transform duration-300 ease-in-out ${
+    <div className={`sticky top-0 z-20 transition-transform duration-300 ease-in-out ${
       isVisible ? 'translate-y-0' : '-translate-y-full'
     }`}>
-      {/* AnnouncementBar as separate component */}
       <AnnouncementBar />
-      
-      {/* Header as separate component */}
-      <Header />
+      <Header /> {/* 👈 Header now uses search context */}
     </div>
   );
 }

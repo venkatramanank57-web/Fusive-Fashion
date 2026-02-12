@@ -1,6 +1,6 @@
 export default function ContactHero() {
   return (
-    <section className="bg-[#f4f4f4] py-16 md:py-24">
+    <section className="bg-[#f4f4f4] py-9 md:py-24">
       <div className="max-w-4xl mx-auto px-6 text-center">
 
         <h1 className="text-3xl md:text-4xl font-semibold text-black mb-4">

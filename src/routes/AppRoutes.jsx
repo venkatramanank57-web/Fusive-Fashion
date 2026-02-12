@@ -26,12 +26,14 @@ import Sale from "../pages/Sale"; // ⭐ SALE PAGE
 import ProductDetailPage from "../pages/ProductDeatilPage";
 import CollectionPage from "../pages/CollectionPage";
 import ShopByCollections from "../pages/ShopByCollections"
+import SearchPage from "../pages/SearchPage";
 import Cart from "../pages/Cart";
 import WishlistPage from "../pages/WishlistPage";
 import Checkout from "../pages/Checkout";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Account from "../pages/Account";
+import FAQPage from "../pages/FAQPage"
 import About from "../pages/About";
 import Lookbook from "../pages/Lookbook";
 import Orders from "../pages/Orders";
@@ -60,8 +62,8 @@ export default function AppRoutes() {
 
           {/* ⭐ SALE PAGE ROUTES */}
           <Route path="/collections/sale" element={<Sale />} />
-          <Route path="/sale" element={<Navigate to="/collections/sale" replace />} />
-          <Route path="/collections/:handle" element={<CollectionPage />} />
+          {/* <Route path="/sale" element={<Navigate to="/collections/sale" replace />} /> */}
+          {/* <Route path="/collections/:handle" element={<CollectionPage />} /> */}
 
 
           {/*showing all collection*/}
@@ -70,6 +72,10 @@ export default function AppRoutes() {
           {/* PRODUCT PAGE */}
           <Route path="/products/:handle" element={<ProductDetailPage />} />
           <Route path="/product/:handle" element={<ProductDetailPage />} />
+
+
+          {/*search page*/}
+          {/* <Route path="/search" element={<SearchPage />} /> */}
 
           {/* SHOPPING */}
           <Route path="/cart" element={<Cart />} />
@@ -86,12 +92,15 @@ export default function AppRoutes() {
 
 
           {/* AUTH */}
-          {/* <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} /> */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
           {/* POLICIES */}
-          {/* <Route path="/policy/:type" element={<PoliciesPage />} />
-          <Route path="/contact" element={<ContactPage />} /> */}
+          <Route path="/policy/:type" element={<PoliciesPage />} />
+          {/* <Route path="/contact" element={<ContactPage />} /> */}
+
+          {/*Fqa page*/}
+          {/* <Route path="/faq" element={<FAQPage />} /> */}
 {/* 
           <Route
             path="/privacy-policy"

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { sendContactMessage } from "../../api/shopify/contact";
+import Toast from "../Toast";
 
 export default function ContactForm() {
   const [form, setForm] = useState({
@@ -10,8 +11,11 @@ export default function ContactForm() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "success",
+  });
 
   const handleChange = (e) => {
     setForm({
@@ -23,21 +27,40 @@ export default function ContactForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     try {
       await sendContactMessage(form);
-      setSuccess(true);
+
+      setToast({
+        show: true,
+        message: "Message sent successfully!",
+        type: "success",
+      });
+
       setForm({ name: "", phone: "", email: "", comment: "" });
+
     } catch (err) {
-      setError("Message send aagala. Thirumba try pannunga.");
+      setToast({
+        show: true,
+        message: "Message send aagala. Thirumba try pannunga.",
+        type: "error",
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section className="bg-[#f4f4f4] py-16">
+    <section className="bg-[#f4f4f4] pb-16">
+      <Toast
+        show={toast.show}
+        message={toast.message}
+        type={toast.type}
+        onClose={() =>
+          setToast((prev) => ({ ...prev, show: false }))
+        }
+      />
+
       <div className="max-w-xl mx-auto px-6">
         <form onSubmit={handleSubmit} className="space-y-6">
 
@@ -87,17 +110,6 @@ export default function ContactForm() {
             {loading ? "Sending..." : "Send"}
           </button>
 
-          {success && (
-            <p className="text-green-600 text-center">
-              Message sent successfully ✅
-            </p>
-          )}
-
-          {error && (
-            <p className="text-red-600 text-center">
-              {error}
-            </p>
-          )}
         </form>
       </div>
     </section>

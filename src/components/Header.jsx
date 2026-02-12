@@ -5,14 +5,19 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { ShoppingBag, User, Menu, X, Search, Heart, Plus, Minus, Globe, ChevronRight } from "lucide-react";
+import { ShoppingBag, User, Menu, X, Search, Heart, Plus, Minus, Globe } from "lucide-react";
+import { useSearch } from "../context/SearchContext"; // 👈 IMPORT SEARCH CONTEXT
 
 export default function Header() {
+  const { openSearch } = useSearch(); // 👈 USE SEARCH CONTEXT
+  
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDesktopMenuOpen, setIsDesktopMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [openAccordions, setOpenAccordions] = useState([]);
+  
+  // 🔥 REMOVED: isSearchOpen, searchQuery, setSearchQuery
+  // 🔥 REMOVED: handleSearch, toggleSearch
+  // 🔥 REMOVED: search overlay JSX block
   
   // NEW: State for scroll behavior
   const [isVisible, setIsVisible] = useState(true);
@@ -34,10 +39,12 @@ export default function Header() {
   // NEW: Refs to track if menus are open
   const isMenuOpenRef = useRef(false);
 
+  // 🔥 REMOVED: useEffect for body scroll lock (now handled in SearchContext)
+
   // Update ref when any menu opens
   useEffect(() => {
-    isMenuOpenRef.current = isMobileMenuOpen || isDesktopMenuOpen || isSearchOpen;
-  }, [isMobileMenuOpen, isDesktopMenuOpen, isSearchOpen]);
+    isMenuOpenRef.current = isMobileMenuOpen || isDesktopMenuOpen;
+  }, [isMobileMenuOpen, isDesktopMenuOpen]);
 
   // NEW: Scroll handling effect
   useEffect(() => {
@@ -151,15 +158,6 @@ export default function Header() {
     }
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-      setIsSearchOpen(false);
-      setSearchQuery("");
-    }
-  };
-
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
     if (!isMobileMenuOpen) {
@@ -174,17 +172,9 @@ export default function Header() {
     }
   };
 
-  const toggleSearch = () => {
-    setIsSearchOpen(!isSearchOpen);
-    if (isSearchOpen) {
-      setSearchQuery("");
-    }
-  };
-
   const closeAllMenus = () => {
     setIsMobileMenuOpen(false);
     setIsDesktopMenuOpen(false);
-    setIsSearchOpen(false);
     setOpenAccordions([]);
   };
 
@@ -201,129 +191,34 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isDesktopMenuOpen]);
 
+  // 👇 ADD THIS: Search click handler using global context
+  const handleSearchClick = () => {
+    openSearch();
+  };
+
   return (
-    <header className={`sticky top-0 z-50 bg-white border-b border-gray-100 transition-transform duration-300 ease-in-out ${
-      isVisible ? 'translate-y-0' : '-translate-y-full'
-    }`}>
-    
-
-      {/* Main Header */}
-      <div className="px-4">
-        {/* MOBILE HEADER */}
-        <div className="lg:hidden flex items-center justify-between h-16">
-          {/* LEFT SIDE: Hamburger + Search + Wishlist */}
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={toggleMobileMenu}
-              className="p-2 rounded-md text-gray-700 hover:text-black"
-              aria-label="Menu"
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-
-            <button
-              onClick={toggleSearch}
-              className="p-2 rounded-full text-gray-700 hover:text-black"
-              aria-label="Search"
-            >
-              <Search size={20} />
-            </button>
-
-            <button
-              onClick={() => navigate("/wishlist")}
-              className="relative p-2 rounded-full text-gray-700 hover:text-red-500"
-              aria-label="Wishlist"
-            >
-              <Heart size={20} />
-              {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {wishlistCount}
-                </span>
-              )}
-            </button>
-          </div>
-
-          {/* CENTER: Brand Name */}
-          <div className="absolute left-1/2 transform -translate-x-1/2">
-            <Link to="/" className="flex items-center">
-              <span className="text-lg font-bold text-gray-900 whitespace-nowrap">
-                Fusive
-              </span>
-            </Link>
-          </div>
-
-          {/* RIGHT SIDE: Account + Cart */}
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => navigate(token ? "/account" : "/login")}
-              className="p-2 rounded-full text-gray-700 hover:text-black"
-              aria-label={token ? "Account" : "Login"}
-            >
-              <User size={20} />
-            </button>
-
-            <Link
-              to="/cart"
-              className="relative p-2 rounded-full text-gray-700 hover:text-black"
-              aria-label="Cart"
-            >
-              <ShoppingBag size={20} />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-            </Link>
-          </div>
-        </div>
-
-        {/* DESKTOP HEADER */}
-        <div className="hidden lg:block">
-          <div className="flex items-center justify-between h-20">
-            {/* Desktop: Left Side - Hamburger */}
-            <div className="flex items-center space-x-8">
+    <>
+      {/* 🔥 HEADER - stays at top */}
+      <header className={`sticky top-0 z-20 bg-white border-b border-gray-100 transition-transform duration-300 ease-in-out ${
+        isVisible ? 'translate-y-0' : '-translate-y-full'
+      }`}>
+      
+        {/* Main Header */}
+        <div className="px-4">
+          {/* MOBILE HEADER */}
+          <div className="lg:hidden flex items-center justify-between h-16">
+            {/* LEFT SIDE: Hamburger + Search + Wishlist */}
+            <div className="flex items-center space-x-2">
               <button
-                onClick={toggleDesktopMenu}
-                className="hamburger-button p-2 rounded-md text-gray-700 hover:text-black"
+                onClick={toggleMobileMenu}
+                className="p-2 rounded-md text-gray-700 hover:text-black"
                 aria-label="Menu"
               >
-                <Menu size={24} />
+                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
-              
-              <Link
-                to="/collections/clothing"
-                className="text-sm font-medium text-gray-700 hover:text-black relative group"
-              >
-                Clothing
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-              <Link
-                to="/collections/sale"
-                className="text-sm font-medium text-red-600 hover:text-red-700 font-semibold relative group"
-              >
-                Sale
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-red-600 transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-            </div>
-
-            {/* Desktop: Center - Brand Name */}
-            <div className="absolute left-1/2 transform -translate-x-1/2">
-              <Link to="/" className="flex items-center">
-                <span className="text-2xl font-bold text-gray-900">
-                  Fusive Fashion
-                </span>
-              </Link>
-            </div>
-
-            {/* Desktop: Right Side */}
-            <div className="flex items-center space-x-6">
-              <div className="flex items-center space-x-1">
-                <span className="text-sm font-medium text-gray-700">INR</span>
-                <span className="text-xs text-gray-500">▼</span>
-              </div>
 
               <button
-                onClick={toggleSearch}
+                onClick={handleSearchClick} // 👈 UPDATED
                 className="p-2 rounded-full text-gray-700 hover:text-black"
                 aria-label="Search"
               >
@@ -342,21 +237,31 @@ export default function Header() {
                   </span>
                 )}
               </button>
+            </div>
 
+            {/* CENTER: Brand Name */}
+            <div className="absolute left-1/2 transform -translate-x-1/2">
+              <Link to="/" className="flex items-center">
+                <span className="text-lg font-bold text-gray-900 whitespace-nowrap">
+                  Fusive
+                </span>
+              </Link>
+            </div>
+
+            {/* RIGHT SIDE: Account + Cart */}
+            <div className="flex items-center space-x-2">
               <button
                 onClick={() => navigate(token ? "/account" : "/login")}
-                className="flex items-center gap-2 p-2 rounded-full text-gray-700 hover:text-black"
+                className="p-2 rounded-full text-gray-700 hover:text-black"
+                aria-label={token ? "Account" : "Login"}
               >
                 <User size={20} />
-                <span className="text-sm font-medium relative inline-block group">
-                  {token ? "Account" : "Login"}
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
-                </span>
               </button>
 
               <Link
                 to="/cart"
                 className="relative p-2 rounded-full text-gray-700 hover:text-black"
+                aria-label="Cart"
               >
                 <ShoppingBag size={20} />
                 {cartCount > 0 && (
@@ -367,118 +272,208 @@ export default function Header() {
               </Link>
             </div>
           </div>
-        </div>
 
-        {/* Search Overlay */}
-        {isSearchOpen && (
-          <div className="absolute left-0 right-0 top-full bg-white border-t border-gray-100 shadow-lg z-50">
-            <div className="px-4 py-4">
-              <form onSubmit={handleSearch} className="relative">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search products..."
-                  className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none"
-                  autoFocus
-                />
-                <Search 
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" 
-                  size={20} 
-                />
+          {/* DESKTOP HEADER */}
+          <div className="hidden lg:block">
+            <div className="flex items-center justify-between h-20">
+              {/* Desktop: Left Side - Hamburger */}
+              <div className="flex items-center space-x-8">
                 <button
-                  type="submit"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black"
+                  onClick={toggleDesktopMenu}
+                  className="hamburger-button p-2 rounded-md text-gray-700 hover:text-black"
+                  aria-label="Menu"
                 >
-                  <Search size={18} />
+                  <Menu size={24} />
                 </button>
-              </form>
+                
+                <Link
+                  to="/collections/clothing"
+                  className="text-sm font-medium text-gray-700 hover:text-black relative group"
+                >
+                  Clothing
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+                </Link>
+                <Link
+                  to="/collections/sale"
+                  className="text-sm font-medium text-red-600 hover:text-red-700 font-semibold relative group"
+                >
+                  Sale
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-red-600 transition-all duration-300 group-hover:w-full"></span>
+                </Link>
+              </div>
+
+              {/* Desktop: Center - Brand Name */}
+              <div className="absolute left-1/2 transform -translate-x-1/2">
+                <Link to="/" className="flex items-center">
+                  <span className="text-2xl font-bold text-gray-900">
+                    Fusive Fashion
+                  </span>
+                </Link>
+              </div>
+
+              {/* Desktop: Right Side */}
+              <div className="flex items-center space-x-6">
+                <div className="flex items-center space-x-1">
+                  <span className="text-sm font-medium text-gray-700">INR</span>
+                  <span className="text-xs text-gray-500">▼</span>
+                </div>
+
+                <button
+                  onClick={handleSearchClick} // 👈 UPDATED
+                  className="p-2 rounded-full text-gray-700 hover:text-black"
+                  aria-label="Search"
+                >
+                  <Search size={20} />
+                </button>
+
+                <button
+                  onClick={() => navigate("/wishlist")}
+                  className="relative p-2 rounded-full text-gray-700 hover:text-red-500"
+                  aria-label="Wishlist"
+                >
+                  <Heart size={20} />
+                  {wishlistCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </button>
+
+                <button
+                  onClick={() => navigate(token ? "/account" : "/login")}
+                  className="flex items-center gap-2 p-2 rounded-full text-gray-700 hover:text-black"
+                >
+                  <User size={20} />
+                  <span className="text-sm font-medium relative inline-block group">
+                    {token ? "Account" : "Login"}
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+                  </span>
+                </button>
+
+                <Link
+                  to="/cart"
+                  className="relative p-2 rounded-full text-gray-700 hover:text-black"
+                >
+                  <ShoppingBag size={20} />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {cartCount}
+                    </span>
+                  )}
+                </Link>
+              </div>
             </div>
           </div>
-        )}
 
-        {/* DESKTOP MENU DRAWER (Left Side - Divided Navigation) */}
-        {isDesktopMenuOpen && (
-          <>
-            {/* Backdrop Overlay - REMOVED COMPLETELY, NO BACKGROUND NEEDED */}
-            
-            {/* Drawer Menu - KEPT ORIGINAL WIDTH FOR DESKTOP */}
-            <div className="desktop-menu-drawer fixed inset-y-0 left-0 w-96 bg-white z-50 transform transition-transform duration-300 ease-in-out shadow-2xl">
-              {/* Drawer Header with FULL WIDTH border bottom */}
-              <div className="flex items-center justify-between pt-6 border-b border-gray-300">
-                <span className="text-xl font-bold text-gray-900">Fusive Fashion</span>
-                <button
-                  onClick={closeAllMenus}
-                  className="p-2 rounded-full text-gray-500 hover:text-black"
-                >
-                  <X size={24} />
-                </button>
-              </div>
+          {/* DESKTOP MENU DRAWER (Left Side - Divided Navigation) */}
+          {isDesktopMenuOpen && (
+            <>
+              {/* Drawer Menu - KEPT ORIGINAL WIDTH FOR DESKTOP */}
+              <div className="desktop-menu-drawer fixed inset-y-0 left-0 w-96 bg-white z-50 transform transition-transform duration-300 ease-in-out shadow-2xl">
+                {/* Drawer Header with FULL WIDTH border bottom */}
+                <div className="flex items-center justify-between pt-6 border-b border-gray-300">
+                  <span className="text-xl font-bold text-gray-900">Fusive Fashion</span>
+                  <button
+                    onClick={closeAllMenus}
+                    className="p-2 rounded-full text-gray-500 hover:text-black"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
 
-              {/* Scrollable Menu Content */}
-              <div className="h-[calc(100vh-73px)] overflow-y-auto bg-white">
-                {/* Main Menu Items with Divided Lines */}
-                <div className="py-4">
-                  {menuItems.map((item, index) => (
-                    <div key={index} className="relative">
-                      {item.hasSubmenu ? (
-                        <>
-                          {/* Accordion Header */}
-                          <div className="px-6 py-4">
-                            <button
-                              onClick={() => toggleAccordion(item.title)}
-                              className="w-full flex items-center justify-between text-left relative group"
-                            >
-                              <div className="flex items-center relative">
-                                <span className="font-medium text-gray-900 group-hover:text-black transition-colors relative inline-block">
+                {/* Scrollable Menu Content */}
+                <div className="h-[calc(100vh-73px)] overflow-y-auto bg-white">
+                  {/* Main Menu Items with Divided Lines */}
+                  <div className="py-4">
+                    {menuItems.map((item, index) => (
+                      <div key={index} className="relative">
+                        {item.hasSubmenu ? (
+                          <>
+                            {/* Accordion Header */}
+                            <div className="px-6 py-4">
+                              <button
+                                onClick={() => toggleAccordion(item.title)}
+                                className="w-full flex items-center justify-between text-left relative group"
+                              >
+                                <div className="flex items-center relative">
+                                  <span className="font-medium text-gray-900 group-hover:text-black transition-colors relative inline-block">
+                                    {item.title}
+                                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+                                  </span>
+                                </div>
+                                <span className="text-gray-400">
+                                  {openAccordions.includes(item.title) ? (
+                                    <Minus size={18} />
+                                  ) : (
+                                    <Plus size={18} />
+                                  )}
+                                </span>
+                              </button>
+                            </div>
+                            
+                            {/* Accordion Content - REMOVED BACKGROUND COLOR */}
+                            {openAccordions.includes(item.title) && (
+                              <div className="mx-6 mb-2">
+                                {item.subItems.map((subItem, subIndex) => (
+                                  <Link
+                                    key={subIndex}
+                                    to={subItem.path}
+                                    onClick={closeAllMenus}
+                                    className="block px-2 py-3 text-gray-600 hover:text-black transition-colors"
+                                  >
+                                    <div className="flex items-center relative group">
+                                      <span className="relative inline-block">
+                                        {subItem.label}
+                                        <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+                                      </span>
+                                    </div>
+                                  </Link>
+                                ))}
+                              </div>
+                            )}
+                            
+                            {/* DIVIDER LINE */}
+                            <div className="px-6">
+                              <hr className="border-t border-gray-200" />
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            {/* Regular Menu Item */}
+                            <div className="px-6 py-4">
+                              <Link
+                                to={item.path}
+                                onClick={closeAllMenus}
+                                className="block font-medium text-gray-900 hover:text-black transition-colors"
+                              >
+                                <span className="relative inline-block group">
                                   {item.title}
                                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
                                 </span>
-                              </div>
-                              <span className="text-gray-400">
-                                {openAccordions.includes(item.title) ? (
-                                  <Minus size={18} />
-                                ) : (
-                                  <Plus size={18} />
-                                )}
-                              </span>
-                            </button>
-                          </div>
-                          
-                          {/* Accordion Content - REMOVED BACKGROUND COLOR */}
-                          {openAccordions.includes(item.title) && (
-                            <div className="mx-6 mb-2">
-                              {item.subItems.map((subItem, subIndex) => (
-                                <Link
-                                  key={subIndex}
-                                  to={subItem.path}
-                                  onClick={closeAllMenus}
-                                  className="block px-2 py-3 text-gray-600 hover:text-black transition-colors"
-                                >
-                                  <div className="flex items-center relative group">
-                                    <span className="relative inline-block">
-                                      {subItem.label}
-                                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
-                                    </span>
-                                  </div>
-                                </Link>
-                              ))}
+                              </Link>
                             </div>
-                          )}
-                          
-                          {/* DIVIDER LINE */}
-                          <div className="px-6">
-                            <hr className="border-t border-gray-200" />
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          {/* Regular Menu Item */}
+                            
+                            {/* DIVIDER LINE */}
+                            <div className="px-6">
+                              <hr className="border-t border-gray-200" />
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Bottom Menu Items */}
+                  <div className="py-4 border-t border-gray-300">
+                    <div className="space-y-0">
+                      {bottomMenuItems.map((item, index) => (
+                        <div key={index} className="relative">
+                          {/* Menu Item */}
                           <div className="px-6 py-4">
                             <Link
                               to={item.path}
                               onClick={closeAllMenus}
-                              className="block font-medium text-gray-900 hover:text-black transition-colors"
+                              className="block text-gray-700 hover:text-black transition-colors"
                             >
                               <span className="relative inline-block group">
                                 {item.title}
@@ -487,156 +482,154 @@ export default function Header() {
                             </Link>
                           </div>
                           
-                          {/* DIVIDER LINE */}
-                          <div className="px-6">
-                            <hr className="border-t border-gray-200" />
-                          </div>
-                        </>
-                      )}
+                          {/* DIVIDER LINE (except for last item) */}
+                          {index < bottomMenuItems.length - 1 && (
+                            <div className="px-6">
+                              <hr className="border-t border-gray-200" />
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
 
-                {/* Bottom Menu Items */}
-                <div className="py-4 border-t border-gray-300">
-                  <div className="space-y-0">
-                    {bottomMenuItems.map((item, index) => (
-                      <div key={index} className="relative">
-                        {/* Menu Item */}
+                    {/* Country & Currency Section */}
+                    <div className="mt-4">
+                      <div className="relative">
+                        {/* Content */}
                         <div className="px-6 py-4">
-                          <Link
-                            to={item.path}
-                            onClick={closeAllMenus}
-                            className="block text-gray-700 hover:text-black transition-colors"
-                          >
-                            <span className="relative inline-block group">
-                              {item.title}
-                              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
-                            </span>
-                          </Link>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                              <Globe size={18} className="text-gray-500 mr-3" />
+                              <div>
+                                <p className="font-medium text-gray-900">INDIA | INR</p>
+                                <p className="text-sm text-gray-500">Change country/region</p>
+                              </div>
+                            </div>
+                            <span className="text-2xl">🌍</span>
+                          </div>
                         </div>
                         
-                        {/* DIVIDER LINE (except for last item) */}
-                        {index < bottomMenuItems.length - 1 && (
-                          <div className="px-6">
-                            <hr className="border-t border-gray-200" />
-                          </div>
+                        {/* DIVIDER LINE (last line) */}
+                        <div className="px-6">
+                          <hr className="border-t border-gray-200" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* MOBILE MENU DRAWER */}
+          {isMobileMenuOpen && (
+            <>
+              {/* Drawer Menu - FULL WIDTH FOR MOBILE */}
+              <div className="fixed inset-0 bg-white z-50 lg:hidden">
+                {/* Drawer Header with FULL WIDTH border bottom */}
+                <div className="flex items-center justify-between pt-6 border-b border-gray-300">
+                  <span className="text-xl font-bold text-gray-900">Fusive Fashion</span>
+                  <button
+                    onClick={closeAllMenus}
+                    className="p-2 rounded-full text-gray-500 hover:text-black"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+
+                {/* Scrollable Menu Content */}
+                <div className="h-[calc(100vh-73px)] overflow-y-auto bg-white">
+                  {/* Main Menu Items */}
+                  <div className="py-4">
+                    {menuItems.map((item, index) => (
+                      <div key={index} className="relative">
+                        {item.hasSubmenu ? (
+                          <>
+                            {/* Accordion Header */}
+                            <div className="px-6 py-4">
+                              <button
+                                onClick={() => toggleAccordion(item.title)}
+                                className="w-full flex items-center justify-between text-left relative group"
+                              >
+                                <div className="flex items-center relative">
+                                  <span className="font-medium text-gray-900 group-hover:text-black transition-colors relative inline-block">
+                                    {item.title}
+                                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+                                  </span>
+                                </div>
+                                <span className="text-gray-400">
+                                  {openAccordions.includes(item.title) ? (
+                                    <Minus size={18} />
+                                  ) : (
+                                    <Plus size={18} />
+                                  )}
+                                </span>
+                              </button>
+                            </div>
+                            
+                            {/* Accordion Content - REMOVED BACKGROUND COLOR */}
+                            {openAccordions.includes(item.title) && (
+                              <div className="mx-6 mb-2">
+                                {item.subItems.map((subItem, subIndex) => (
+                                  <Link
+                                    key={subIndex}
+                                    to={subItem.path}
+                                    onClick={closeAllMenus}
+                                    className="block px-2 py-3 text-gray-600 hover:text-black transition-colors"
+                                  >
+                                    <div className="flex items-center relative group">
+                                      <span className="relative inline-block">
+                                        {subItem.label}
+                                        <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+                                      </span>
+                                    </div>
+                                  </Link>
+                                ))}
+                              </div>
+                            )}
+                            
+                            {/* DIVIDER LINE */}
+                            <div className="px-6">
+                              <hr className="border-t border-gray-200" />
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            {/* Regular Menu Item */}
+                            <div className="px-6 py-4">
+                              <Link
+                                to={item.path}
+                                onClick={closeAllMenus}
+                                className="block font-medium text-gray-900 hover:text-black transition-colors"
+                              >
+                                <span className="relative inline-block group">
+                                  {item.title}
+                                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+                                </span>
+                              </Link>
+                            </div>
+                            
+                            {/* DIVIDER LINE */}
+                            <div className="px-6">
+                              <hr className="border-t border-gray-200" />
+                            </div>
+                          </>
                         )}
                       </div>
                     ))}
                   </div>
 
-                  {/* Country & Currency Section */}
-                  <div className="mt-4">
-                    <div className="relative">
-                      {/* Content */}
-                      <div className="px-6 py-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <Globe size={18} className="text-gray-500 mr-3" />
-                            <div>
-                              <p className="font-medium text-gray-900">INDIA | INR</p>
-                              <p className="text-sm text-gray-500">Change country/region</p>
-                            </div>
-                          </div>
-                          <span className="text-2xl">🌍</span>
-                        </div>
-                      </div>
-                      
-                      {/* DIVIDER LINE (last line) */}
-                      <div className="px-6">
-                        <hr className="border-t border-gray-200" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* MOBILE MENU DRAWER */}
-        {isMobileMenuOpen && (
-          <>
-            {/* REMOVED BACKDROP OVERLAY COMPLETELY - NO TRANSPARENCY */}
-            
-            {/* Drawer Menu - FULL WIDTH FOR MOBILE */}
-            <div className="fixed inset-0 bg-white z-50 lg:hidden">
-              {/* Drawer Header with FULL WIDTH border bottom */}
-              <div className="flex items-center justify-between pt-6 border-b border-gray-300">
-                <span className="text-xl font-bold text-gray-900">Fusive Fashion</span>
-                <button
-                  onClick={closeAllMenus}
-                  className="p-2 rounded-full text-gray-500 hover:text-black"
-                >
-                  <X size={24} />
-                </button>
-              </div>
-
-              {/* Scrollable Menu Content */}
-              <div className="h-[calc(100vh-73px)] overflow-y-auto  bg-white">
-                {/* Main Menu Items */}
-                <div className="py-4">
-                  {menuItems.map((item, index) => (
-                    <div key={index} className="relative">
-                      {item.hasSubmenu ? (
-                        <>
-                          {/* Accordion Header */}
-                          <div className="px-6 py-4">
-                            <button
-                              onClick={() => toggleAccordion(item.title)}
-                              className="w-full flex items-center justify-between text-left relative group"
-                            >
-                              <div className="flex items-center relative">
-                                <span className="font-medium text-gray-900 group-hover:text-black transition-colors relative inline-block">
-                                  {item.title}
-                                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
-                                </span>
-                              </div>
-                              <span className="text-gray-400">
-                                {openAccordions.includes(item.title) ? (
-                                  <Minus size={18} />
-                                ) : (
-                                  <Plus size={18} />
-                                )}
-                              </span>
-                            </button>
-                          </div>
-                          
-                          {/* Accordion Content - REMOVED BACKGROUND COLOR */}
-                          {openAccordions.includes(item.title) && (
-                            <div className="mx-6 mb-2">
-                              {item.subItems.map((subItem, subIndex) => (
-                                <Link
-                                  key={subIndex}
-                                  to={subItem.path}
-                                  onClick={closeAllMenus}
-                                  className="block px-2 py-3 text-gray-600 hover:text-black transition-colors"
-                                >
-                                  <div className="flex items-center relative group">
-                                    <span className="relative inline-block">
-                                      {subItem.label}
-                                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
-                                    </span>
-                                  </div>
-                                </Link>
-                              ))}
-                            </div>
-                          )}
-                          
-                          {/* DIVIDER LINE */}
-                          <div className="px-6">
-                            <hr className="border-t border-gray-200" />
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          {/* Regular Menu Item */}
+                  {/* Bottom Menu Items */}
+                  <div className="py-4 border-t border-gray-300">
+                    <div className="space-y-0">
+                      {bottomMenuItems.map((item, index) => (
+                        <div key={index} className="relative">
+                          {/* Menu Item */}
                           <div className="px-6 py-4">
                             <Link
                               to={item.path}
                               onClick={closeAllMenus}
-                              className="block font-medium text-gray-900 hover:text-black transition-colors"
+                              className="block text-gray-700 hover:text-black transition-colors"
                             >
                               <span className="relative inline-block group">
                                 {item.title}
@@ -645,74 +638,48 @@ export default function Header() {
                             </Link>
                           </div>
                           
-                          {/* DIVIDER LINE */}
-                          <div className="px-6">
-                            <hr className="border-t border-gray-200" />
-                          </div>
-                        </>
-                      )}
+                          {/* DIVIDER LINE (except for last item) */}
+                          {index < bottomMenuItems.length - 1 && (
+                            <div className="px-6">
+                              <hr className="border-t border-gray-200" />
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
 
-                {/* Bottom Menu Items */}
-                <div className="py-4 border-t border-gray-300">
-                  <div className="space-y-0">
-                    {bottomMenuItems.map((item, index) => (
-                      <div key={index} className="relative">
-                        {/* Menu Item */}
+                    {/* Country & Currency Section */}
+                    <div className="mt-4">
+                      <div className="relative">
+                        {/* Content */}
                         <div className="px-6 py-4">
-                          <Link
-                            to={item.path}
-                            onClick={closeAllMenus}
-                            className="block text-gray-700 hover:text-black transition-colors"
-                          >
-                            <span className="relative inline-block group">
-                              {item.title}
-                              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
-                            </span>
-                          </Link>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                              <Globe size={18} className="text-gray-500 mr-3" />
+                              <div>
+                                <p className="font-medium text-gray-900">INDIA | INR</p>
+                                <p className="text-sm text-gray-500">Change country/region</p>
+                              </div>
+                            </div>
+                            <span className="text-2xl">🌍</span>
+                          </div>
                         </div>
                         
-                        {/* DIVIDER LINE (except for last item) */}
-                        {index < bottomMenuItems.length - 1 && (
-                          <div className="px-6">
-                            <hr className="border-t border-gray-200" />
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Country & Currency Section */}
-                  <div className="mt-4">
-                    <div className="relative">
-                      {/* Content */}
-                      <div className="px-6 py-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <Globe size={18} className="text-gray-500 mr-3" />
-                            <div>
-                              <p className="font-medium text-gray-900">INDIA | INR</p>
-                              <p className="text-sm text-gray-500">Change country/region</p>
-                            </div>
-                          </div>
-                          <span className="text-2xl">🌍</span>
+                        {/* DIVIDER LINE (last line) */}
+                        <div className="px-6">
+                          <hr className="border-t border-gray-200" />
                         </div>
-                      </div>
-                      
-                      {/* DIVIDER LINE (last line) */}
-                      <div className="px-6">
-                        <hr className="border-t border-gray-200" />
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </>
-        )}
-      </div>
-    </header>
+            </>
+          )}
+        </div>
+      </header>
+
+      {/* 🔥 REMOVED: FULL SCREEN SEARCH OVERLAY - Now handled at root level in App.jsx */}
+    </>
   );
 }

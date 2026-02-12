@@ -179,14 +179,14 @@ export default function CollectionPage() {
           );
           return priceA - priceB;
 
-        case "price-high-low":
-          const priceHighA = parseFloat(
-            productA.priceRange?.maxVariantPrice?.amount || 0,
-          );
-          const priceHighB = parseFloat(
-            productB.priceRange?.maxVariantPrice?.amount || 0,
-          );
-          return priceHighB - priceHighA;
+     case "price-high-low":
+  const priceHighA = parseFloat(
+    productA.priceRange?.minVariantPrice?.amount || 0,
+  );
+  const priceHighB = parseFloat(
+    productB.priceRange?.minVariantPrice?.amount || 0,
+  );
+  return priceHighB - priceHighA;
 
         case "date-old-new":
           const dateA = new Date(productA.createdAt || 0);
@@ -399,3 +399,4 @@ export default function CollectionPage() {
     </div>
   );
 }
+
