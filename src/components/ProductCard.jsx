@@ -1,6 +1,6 @@
 // =====================================
 // src/components/ProductCard.jsx
-// INCLUDES SKELETON LOADER
+// FIXED VERSION - Color variants and hover working properly
 // =====================================
 
 import { Link } from "react-router-dom";
@@ -10,34 +10,20 @@ import { useState, useEffect, useRef } from "react";
 export function ProductCardSkeleton() {
   return (
     <div className="block no-underline text-inherit w-full">
-      {/* MAIN CARD CONTAINER - MATCHES ProductCard EXACTLY */}
       <div className="bg-white rounded-lg overflow-hidden animate-pulse">
-        {/* Product Image Skeleton - Responsive aspect ratio */}
         <div className="relative overflow-hidden bg-gray-200 aspect-[2/3] md:aspect-[4/5] lg:aspect-[2/3]">
-          {/* Image placeholder - exact same dimensions as real image */}
           <div className="w-full h-full bg-gray-300"></div>
         </div>
 
-        {/* Product Info Skeleton - TEXT LEFT ALIGNED, EXACTLY LIKE REAL CARD */}
         <div className="px-2 sm:px-3 md:px-4 py-2 sm:py-3">
-          {/* Brand/Vendor Skeleton (small text at top) */}
           <div className="h-2.5 sm:h-3 w-12 sm:w-16 bg-gray-200 rounded mb-1"></div>
-          
-          {/* Product Title Skeleton (main title) */}
           <div className="h-3 sm:h-4 w-full bg-gray-200 rounded mb-1.5 sm:mb-2"></div>
           <div className="h-3 sm:h-4 w-3/4 bg-gray-200 rounded mb-1.5 sm:mb-2"></div>
-          
-          {/* Product Price Skeleton */}
           <div className="h-4 sm:h-5 w-20 sm:w-24 bg-gray-300 rounded"></div>
-          
-          {/* Color Variants Dots Skeleton - Shows 3 color dots */}
           <div className="mt-1.5 sm:mt-2">
             <div className="flex flex-wrap gap-1 sm:gap-1.5">
-              {/* First color dot */}
               <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-gray-200"></div>
-              {/* Second color dot */}
               <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-gray-200"></div>
-              {/* Third color dot */}
               <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-gray-200"></div>
             </div>
           </div>
@@ -66,6 +52,15 @@ export default function ProductCard({ product }) {
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
   
+  // Debug - log product data to see structure
+  useEffect(() => {
+    if (product) {
+      console.log("Product data:", product);
+      console.log("Product variants:", product.variants);
+      console.log("Product images:", product.images);
+    }
+  }, [product]);
+  
   // Initialize component
   useEffect(() => {
     if (product) {
@@ -76,37 +71,57 @@ export default function ProductCard({ product }) {
       setDisplayImage(defaultImage);
       
       // Find second image
-      const allImages = product.images?.edges || [];
-      let secondImg = "";
+      findSecondImage(product);
       
-      if (allImages.length > 1) {
-        secondImg = allImages[1].node.url;
-      } else if (product.variants?.edges) {
-        for (const { node: variant } of product.variants.edges) {
-          if (variant.image?.url && variant.image.url !== defaultImage) {
-            secondImg = variant.image.url;
-            break;
-          }
-        }
-      }
-      
-      secondImg = secondImg || defaultImage;
-      secondImageRef.current = secondImg;
-      
+      // Extract color variants
       extractColorVariants(product);
     }
   }, [product]);
   
-  // Extract color variants
+  // Find second image for hover effect - IMPROVED
+  const findSecondImage = (product) => {
+    const defaultImage = product.featuredImage?.url || "";
+    let secondImg = "";
+    
+    // Try to get from images array
+    if (product.images?.edges && product.images.edges.length > 1) {
+      secondImg = product.images.edges[1].node.url;
+      console.log("Found second image from images:", secondImg);
+    } 
+    // Try to get from variants
+    else if (product.variants?.edges) {
+      for (const { node: variant } of product.variants.edges) {
+        if (variant.image?.url && variant.image.url !== defaultImage) {
+          secondImg = variant.image.url;
+          console.log("Found second image from variant:", secondImg);
+          break;
+        }
+      }
+    }
+    
+    // If no second image found, use default
+    secondImageRef.current = secondImg || defaultImage;
+    console.log("Second image ref set to:", secondImageRef.current);
+  };
+  
+  // Extract color variants - IMPROVED with more option name checks
   const extractColorVariants = (product) => {
     const colors = [];
     const colorMap = new Map();
     
+    console.log("Extracting color variants from product:", product.title);
+    
     if (product.variants?.edges) {
-      product.variants.edges.forEach(({ node: variant }) => {
-        const colorOption = variant.selectedOptions?.find(
-          option => option.name.toLowerCase() === 'color'
-        );
+      product.variants.edges.forEach(({ node: variant }, index) => {
+        console.log(`Variant ${index}:`, variant);
+        
+        // Check for color in selectedOptions - try different case variations
+        const colorOption = variant.selectedOptions?.find(option => {
+          const optionName = option.name.toLowerCase();
+          return optionName === 'color' || optionName === 'colour' || optionName === 'colors';
+        });
+        
+        console.log(`Variant ${index} color option:`, colorOption);
         
         if (colorOption && variant.image?.url) {
           const colorName = colorOption.value;
@@ -120,15 +135,20 @@ export default function ProductCard({ product }) {
               imageUrl: variant.image.url,
               displayColor: getColorHex(colorName)
             });
+            console.log(`Added color variant: ${colorName} with image:`, variant.image.url);
           }
+        } else if (variant.image?.url && !colorOption) {
+          // If variant has image but no color option, still try to use it
+          console.log(`Variant ${index} has image but no color option`);
         }
       });
     }
     
+    console.log("Final color variants:", colors);
     setColorVariants(colors);
   };
   
-  // Color to hex mapping
+  // Color to hex mapping - EXPANDED
   const getColorHex = (colorName) => {
     const colorMap = {
       'black': '#000000',
@@ -141,6 +161,7 @@ export default function ProductCard({ product }) {
       'purple': '#800080',
       'orange': '#FFA500',
       'gray': '#808080',
+      'grey': '#808080',
       'brown': '#A52A2A',
       'navy': '#000080',
       'teal': '#008080',
@@ -148,6 +169,13 @@ export default function ProductCard({ product }) {
       'olive': '#808000',
       'silver': '#C0C0C0',
       'gold': '#FFD700',
+      'beige': '#F5F5DC',
+      'ivory': '#FFFFF0',
+      'tan': '#D2B48C',
+      'coral': '#FF7F50',
+      'lavender': '#E6E6FA',
+      'mint': '#98FB98',
+      'peach': '#FFE5B4',
     };
     
     return colorMap[colorName.toLowerCase()] || '#CCCCCC';
@@ -160,6 +188,7 @@ export default function ProductCard({ product }) {
     setIsHovering(true);
     
     if (secondImageRef.current && secondImageRef.current !== defaultImageRef.current) {
+      console.log("Mouse enter - showing second image");
       setDisplayImage(secondImageRef.current);
     }
   };
@@ -169,48 +198,17 @@ export default function ProductCard({ product }) {
     setIsHovering(false);
     
     if (!selectedColor) {
+      console.log("Mouse leave - showing default image");
       setDisplayImage(defaultImageRef.current);
     }
-  };
-  
-  // Touch event handlers for mobile
-  const handleTouchStart = (e) => {
-    if (selectedColor) return;
-    
-    const touchDown = e.touches[0].clientX;
-    setTouchStart(touchDown);
-  };
-  
-  const handleTouchMove = (e) => {
-    if (selectedColor) return;
-    
-    const touchUp = e.touches[0].clientX;
-    setTouchEnd(touchUp);
-    
-    // If user swiped left (showing second image)
-    if (touchStart - touchEnd > 50 && !isHovering) {
-      setIsHovering(true);
-      if (secondImageRef.current && secondImageRef.current !== defaultImageRef.current) {
-        setDisplayImage(secondImageRef.current);
-      }
-    }
-    
-    // If user swiped right (showing default image)
-    if (touchEnd - touchStart > 50 && isHovering) {
-      setIsHovering(false);
-      setDisplayImage(defaultImageRef.current);
-    }
-  };
-  
-  const handleTouchEnd = () => {
-    setTouchStart(0);
-    setTouchEnd(0);
   };
   
   // Handle color dot click
   const handleColorClick = (color, e) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    console.log("Color clicked:", color);
     
     setIsHovering(false);
     setSelectedColor(color.value);
@@ -219,14 +217,46 @@ export default function ProductCard({ product }) {
   
   // Reset to default
   const resetToDefault = (e) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+    e.preventDefault();
+    e.stopPropagation();
+    
+    console.log("Reset to default");
     
     setIsHovering(false);
     setSelectedColor(null);
     setDisplayImage(defaultImageRef.current);
+  };
+  
+  // Touch event handlers for mobile
+  const handleTouchStart = (e) => {
+    if (selectedColor) return;
+    setTouchStart(e.touches[0].clientX);
+  };
+  
+  const handleTouchMove = (e) => {
+    if (selectedColor) return;
+    
+    const touchMove = e.touches[0].clientX;
+    setTouchEnd(touchMove);
+    
+    // Swipe left - show second image
+    if (touchStart - touchMove > 50 && !isHovering) {
+      setIsHovering(true);
+      if (secondImageRef.current && secondImageRef.current !== defaultImageRef.current) {
+        setDisplayImage(secondImageRef.current);
+      }
+    }
+    
+    // Swipe right - show default image
+    if (touchMove - touchStart > 50 && isHovering) {
+      setIsHovering(false);
+      setDisplayImage(defaultImageRef.current);
+    }
+  };
+  
+  const handleTouchEnd = () => {
+    setTouchStart(0);
+    setTouchEnd(0);
   };
   
   // Handle image load
@@ -240,10 +270,9 @@ export default function ProductCard({ product }) {
   const getBrandFromProduct = () => {
     if (product.vendor) return product.vendor;
     
-    // Try to extract brand from tags
     if (product.tags && product.tags.length > 0) {
       const brandTags = product.tags.filter(tag => 
-        ['MOE', 'Nike', 'Adidas', 'Zara', 'H&M'].includes(tag.toUpperCase())
+        tag.length < 20 && !tag.includes(' ') // Assume brand tags are short and without spaces
       );
       if (brandTags.length > 0) return brandTags[0];
     }
@@ -267,7 +296,7 @@ export default function ProductCard({ product }) {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* MAIN CARD CONTAINER - Responsive padding and hover effects */}
+      {/* MAIN CARD CONTAINER */}
       <div 
         className="bg-white rounded-lg overflow-hidden w-full
                    hover:shadow-md transition-all duration-300 
@@ -276,7 +305,7 @@ export default function ProductCard({ product }) {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        {/* Product Image - Responsive aspect ratio */}
+        {/* Product Image */}
         <div className="relative overflow-hidden bg-gray-50 
                        aspect-[2/3] md:aspect-[4/5] lg:aspect-[2/3]">
           {!isImageLoaded && (
@@ -292,24 +321,25 @@ export default function ProductCard({ product }) {
               }`}
               onLoad={handleImageLoad}
               loading="lazy"
-              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
             />
           )}
           
-          {/* Mobile swipe indicator */}
-          <div className="sm:hidden absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full opacity-70">
-            {isHovering ? "← Swipe back" : "Swipe →"}
-          </div>
+          {/* Mobile swipe indicator - only show if there's a second image */}
+          {secondImageRef.current && secondImageRef.current !== defaultImageRef.current && !selectedColor && (
+            <div className="sm:hidden absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full opacity-70">
+              {isHovering ? "← Default" : "Swipe →"}
+            </div>
+          )}
         </div>
 
-        {/* Product Info - Responsive padding and text sizes */}
+        {/* Product Info */}
         <div className="px-2 sm:px-3 md:px-4 py-2 sm:py-3">
-          {/* Brand/Vendor (small text at top) */}
+          {/* Brand/Vendor */}
           <p className="text-[10px] xs:text-xs text-gray-500 font-medium uppercase tracking-wide mb-0.5 sm:mb-1">
             {getBrandFromProduct()}
           </p>
           
-          {/* Product Title (main title) */}
+          {/* Product Title */}
           <h3 className="font-normal text-gray-900 text-xs sm:text-sm mb-1.5 sm:mb-2 line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">
             {product.title}
           </h3>
@@ -319,7 +349,7 @@ export default function ProductCard({ product }) {
             {formatPrice(product.priceRange?.minVariantPrice?.amount || "0.00")}
           </p>
           
-          {/* Color Variants Dots - Only show if available */}
+          {/* Color Variants Dots */}
           {colorVariants.length > 0 && (
             <div className="mt-1.5 sm:mt-2">
               <div className="flex flex-wrap gap-1 sm:gap-1.5">
@@ -328,12 +358,16 @@ export default function ProductCard({ product }) {
                     key={color.value}
                     type="button"
                     onClick={(e) => handleColorClick(color, e)}
-                    className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full transition-all duration-200 flex items-center justify-center
-                      ${selectedColor === color.value 
-                        ? 'ring-1 ring-gray-800' 
-                        : 'ring-1 ring-gray-200 hover:ring-gray-400'
-                      }`}
-                    style={{ backgroundColor: color.displayColor }}
+                    className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full transition-all duration-200 
+                               hover:scale-110 focus:outline-none
+                               ${selectedColor === color.value 
+                                 ? 'ring-2 ring-offset-1 ring-gray-800' 
+                                 : 'ring-1 ring-gray-300 hover:ring-gray-600'
+                               }`}
+                    style={{ 
+                      backgroundColor: color.displayColor,
+                      border: color.displayColor === '#FFFFFF' ? '1px solid #e5e7eb' : 'none'
+                    }}
                     title={color.name}
                     aria-label={`Select ${color.name} color`}
                   >
@@ -343,20 +377,19 @@ export default function ProductCard({ product }) {
                   </button>
                 ))}
               </div>
-            </div>
-          )}
-          
-          {/* Reset Button - Only show on hover or when color selected */}
-          {selectedColor && (
-            <div className="mt-1.5 sm:mt-2">
-              <button
-                type="button"
-                onClick={resetToDefault}
-                className="text-[10px] sm:text-xs text-gray-500 hover:text-gray-700 hover:underline transition-colors duration-200"
-                aria-label="Reset to default image"
-              >
-                Reset
-              </button>
+              
+              {/* Reset Button */}
+              {selectedColor && (
+                <div className="mt-1.5 sm:mt-2">
+                  <button
+                    type="button"
+                    onClick={resetToDefault}
+                    className="text-[10px] sm:text-xs text-gray-500 hover:text-gray-700 hover:underline transition-colors duration-200"
+                  >
+                    Reset
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

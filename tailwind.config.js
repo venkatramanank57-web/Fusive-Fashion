@@ -31,7 +31,7 @@ export default {
       // 🎞️ ALL ANIMATIONS
       animation: {
         // Announcement bar marquee
-        marquee: "marquee 25s linear infinite",
+        marquee: "marquee 60s linear infinite",
         marquee2: "marquee2 25s linear infinite",
 
         // ✅ Brand logo marquee (NEW)

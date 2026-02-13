@@ -31,24 +31,31 @@ export default function Toast({ show, message, type = "success", onClose }) {
   const config = typeConfig[type] || typeConfig.success;
 
   return (
-    <div className="fixed top-38 right-6 z-[9999] animate-slide-in">
-      <div className={`${config.bg} ${config.border} border rounded-lg shadow-lg max-w-md`}>
-        <div className="flex items-start p-4">
-          <div className="flex-shrink-0 mr-3">
+    <div className="fixed top-[120px] right-6 z-[9999] animate-slide-in">
+      <div
+        className={`${config.bg} ${config.border} border rounded-xl shadow-xl max-w-sm w-full`}
+      >
+        <div className="flex items-start p-4 gap-3">
+
+          {/* Icon */}
+          <div className="flex-shrink-0">
             {config.icon}
           </div>
-          <div className="flex-1">
-            <div className={`text-sm font-medium ${config.text}`}>
-              {message}
-            </div>
+
+          {/* Message */}
+          <div className={`text-sm font-medium ${config.text}`}>
+            {message}
           </div>
+
+          {/* Close Button */}
           <button
             onClick={onClose}
-            className="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-600"
+            className="ml-auto text-gray-400 hover:text-gray-600 transition"
             aria-label="Close"
           >
             <X size={18} />
           </button>
+
         </div>
       </div>
     </div>

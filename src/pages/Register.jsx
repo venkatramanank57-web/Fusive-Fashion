@@ -1,13 +1,13 @@
 // =====================================
 // src/pages/Register.jsx
-// Split Screen Authentication Layout with Rounded Left Side
+// Clean Card Layout with Inner Rounded Left Section
 // =====================================
 
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation } from "@apollo/client/react";
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, ArrowRight } from "lucide-react";
 
 import {
   CUSTOMER_REGISTER,
@@ -28,6 +28,7 @@ export default function Register() {
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -45,10 +46,10 @@ export default function Register() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value
-    });
+    }));
     dispatch(clearError());
   };
 
@@ -62,26 +63,24 @@ export default function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    if (!formData.fullName || !formData.email || !formData.password) {
-      showToast("Please fill in all required fields", "error");
-      return;
+    const { fullName, email, password } = formData;
+
+    if (!fullName || !email || !password) {
+      return showToast("All fields are required", "error");
     }
 
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      showToast("Please enter a valid email address", "error");
-      return;
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      return showToast("Invalid email address", "error");
     }
 
-    if (formData.password.length < 8) {
-      showToast("Password must be at least 8 characters long", "error");
-      return;
+    if (password.length < 8) {
+      return showToast("Password must be at least 8 characters", "error");
     }
 
     dispatch(setLoading(true));
 
     try {
-      // Split full name into first and last name
-      const nameParts = formData.fullName.trim().split(" ");
+      const nameParts = fullName.trim().split(" ");
       const firstName = nameParts[0] || "";
       const lastName = nameParts.slice(1).join(" ") || "";
 
@@ -90,41 +89,34 @@ export default function Register() {
           input: {
             firstName,
             lastName,
-            email: formData.email,
-            password: formData.password,
+            email,
+            password,
             acceptsMarketing: false
           }
         }
       });
 
-      const createResult = data.customerCreate;
+      const createResult = data?.customerCreate;
 
-      if (createResult.customerUserErrors.length > 0) {
+      if (createResult?.customerUserErrors?.length > 0) {
         const errorMsg = createResult.customerUserErrors[0].message;
         dispatch(setError(errorMsg));
-        showToast(errorMsg, "error");
-        return;
+        return showToast(errorMsg, "error");
       }
 
       const loginResponse = await loginMutation({
-        variables: {
-          input: {
-            email: formData.email,
-            password: formData.password
-          }
-        }
+        variables: { input: { email, password } }
       });
 
-      const loginResult = loginResponse.data.customerAccessTokenCreate;
+      const loginResult = loginResponse?.data?.customerAccessTokenCreate;
 
-      if (loginResult.customerUserErrors.length > 0) {
+      if (loginResult?.customerUserErrors?.length > 0) {
         showToast("Account created. Please login manually.", "success");
-        navigate("/login");
-        return;
+        return navigate("/login");
       }
 
-      const token = loginResult.customerAccessToken.accessToken;
-      const expiry = loginResult.customerAccessToken.expiresAt;
+      const token = loginResult?.customerAccessToken?.accessToken;
+      const expiry = loginResult?.customerAccessToken?.expiresAt;
 
       localStorage.setItem("customerToken", token);
       localStorage.setItem("tokenExpiry", expiry);
@@ -137,23 +129,20 @@ export default function Register() {
         })
       );
 
-      showToast("Registration successful! Welcome.", "success");
+      showToast("Registration successful!", "success");
+      setTimeout(() => navigate("/account"), 1000);
 
-      setTimeout(() => {
-        navigate("/account");
-      }, 1200);
-
-    } catch (error) {
-      console.error("Registration error:", error);
-      dispatch(setError(error.message));
-      showToast("Registration failed. Please try again.", "error");
+    } catch (err) {
+      dispatch(setError(err.message));
+      showToast("Registration failed. Try again.", "error");
     } finally {
       dispatch(setLoading(false));
     }
   };
 
   return (
-    <div className="min-h-screen bg-white flex relative z-10">
+    <div className="min-h-screen flex items-center justify-center bg-[#F4F2FF] px-6 py-20 relative z-10">
+      
       <Toast
         show={toast.show}
         message={toast.message}
@@ -161,191 +150,106 @@ export default function Register() {
         onClose={() => setToast({ ...toast, show: false })}
       />
 
-      {/* Left Column - Branding & Visual with Rounded Corners */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-gray-900 to-baltic overflow-hidden rounded-br-[48px] rounded-tr-[48px]">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }} />
-        </div>
+      {/* White Main Card */}
+      <div className="w-full max-w-6xl bg-white rounded-3xl shadow-2xl p-8">
         
-        {/* Content */}
-        <div className="relative flex flex-col justify-between p-12 w-full">
-          <div>
-            <Link to="/" className="inline-block">
-              <span className="text-2xl font-light tracking-widest text-white">
-                CLASSIC DESIGNS
-              </span>
-            </Link>
-          </div>
+        {/* Inner Layout with Gap */}
+        <div className="flex gap-8 min-h-[650px]">
           
-          <div className="space-y-6">
-            <h1 className="text-5xl font-light text-white leading-tight">
-              Join Our Community
-              <br />
-              <span className="font-medium">CLASSIC DESIGNS</span>
-            </h1>
-            <p className="text-gray-200 text-lg max-w-md">
-              Create an account to enjoy exclusive offers, track your orders, and be the first to know about new arrivals.
-            </p>
+          {/* Left Gradient Box (Now Fully Rounded & Not Touching Edges) */}
+          <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-500 rounded-2xl p-16 text-white flex-col justify-between">
             
-            {/* Benefits/Features */}
-            <div className="pt-6">
-              <div className="flex items-center gap-4 text-white">
-                <div className="border-r border-white/30 pr-4">
-                  <p className="text-2xl font-bold">Free</p>
-                  <p className="text-sm text-gray-200">Shipping</p>
-                </div>
-                <div className="border-r border-white/30 pr-4">
-                  <p className="text-2xl font-bold">30-Day</p>
-                  <p className="text-sm text-gray-200">Returns</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">24/7</p>
-                  <p className="text-sm text-gray-200">Support</p>
-                </div>
-              </div>
+            <div className="text-5xl font-bold opacity-90">
+              *
             </div>
+            
+            <div className="space-y-6">
+              <p className="text-sm opacity-80">
+                You can easily
+              </p>
+              
+              <h1 className="text-4xl font-semibold leading-snug">
+                Get access your personal hub
+                for clarity and productivity
+              </h1>
+            </div>
+            
           </div>
           
-          <div className="text-white/80 text-sm">
-            <p>© 2024 CLASSIC DESIGNS. All rights reserved.</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Right Column - Registration Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="max-w-md w-full">
-          {/* Mobile Logo (visible only on mobile) */}
-          <div className="lg:hidden text-center mb-8">
-            <Link to="/" className="inline-block">
-              <span className="text-2xl font-light tracking-widest text-baltic">
-                CLASSIC DESIGNS
-              </span>
-            </Link>
-          </div>
-
-          {/* Header */}
-          <div className="mb-8">
-            <h2 className="text-3xl font-light text-gray-900">
-              Create Account
-            </h2>
-            <p className="mt-2 text-gray-600">
-              Already have an account?{" "}
-              <Link to="/login" className="font-medium text-baltic hover:underline">
-                Sign in
-              </Link>
-            </p>
-          </div>
-
-          {/* Registration Form */}
-          <div className="bg-white rounded-xl">
+          {/* Right Form Section */}
+          <div className="w-full md:w-1/2 flex flex-col justify-center px-6">
+            
+            <div className="mb-10">
+              <div className="text-indigo-600 text-3xl mb-3">*</div>
+              
+              <h2 className="text-3xl font-semibold text-gray-900">
+                Create an account
+              </h2>
+              
+              <p className="mt-3 text-gray-500 text-sm max-w-sm">
+                Access your tasks, notes, and projects anytime.
+              </p>
+            </div>
+            
             <form onSubmit={handleRegister} className="space-y-6">
-              {/* Full Name */}
-              <div>
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    id="fullName"
-                    name="fullName"
-                    type="text"
-                    autoComplete="name"
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-baltic focus:border-transparent outline-none transition"
-                    placeholder="John Doe"
-                    required
-                  />
-                </div>
+              
+              <input
+                name="fullName"
+                type="text"
+                placeholder="Full Name"
+                value={formData.fullName}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+              />
+              
+              <input
+                name="email"
+                type="email"
+                placeholder="Your email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+              />
+              
+              <div className="relative">
+                <input
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 pr-10 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3 text-gray-500"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
-
-              {/* Email */}
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-baltic focus:border-transparent outline-none transition"
-                    placeholder="you@example.com"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Password */}
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    autoComplete="new-password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="pl-10 pr-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-baltic focus:border-transparent outline-none transition"
-                    placeholder="••••••••"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                    ) : (
-                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                    )}
-                  </button>
-                </div>
-                <p className="mt-1 text-xs text-gray-500">
-                  Must be at least 8 characters long
-                </p>
-              </div>
-
-              {/* Submit Button */}
+              
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex items-center justify-center py-3 px-4 bg-baltic text-white rounded-lg hover:bg-gray-800 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="w-full py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium shadow-lg hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center"
               >
-                {loading ? "Creating Account..." : "Sign Up"}
+                {loading ? "Creating..." : "Get Started"}
                 {!loading && <ArrowRight className="ml-2 h-5 w-5" />}
               </button>
+              
             </form>
-          </div>
-
-          {/* Terms */}
-          <div className="mt-6 text-center">
-            <p className="text-xs text-gray-500">
-              By creating an account, you agree to our{" "}
-              <Link to="/terms" className="text-baltic hover:underline">Terms</Link>{" "}
-              and{" "}
-              <Link to="/privacy" className="text-baltic hover:underline">Privacy Policy</Link>
-            </p>
+            
+            <div className="mt-8 text-sm text-gray-500 text-center">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="text-indigo-600 font-medium hover:underline"
+              >
+                Sign in
+              </Link>
+            </div>
+            
           </div>
         </div>
       </div>

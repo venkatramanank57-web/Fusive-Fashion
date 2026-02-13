@@ -318,13 +318,13 @@ export default function Header() {
                   <span className="text-xs text-gray-500">▼</span>
                 </div>
 
-                {/* <button
+                <button
                   onClick={handleSearchClick} // 👈 UPDATED
                   className="p-2 rounded-full text-gray-700 hover:text-black"
                   aria-label="Search"
                 >
                   <Search size={20} />
-                </button> */}
+                </button>
 
                 <button
                   onClick={() => navigate("/wishlist")}

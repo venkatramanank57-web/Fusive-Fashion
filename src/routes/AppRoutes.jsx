@@ -75,7 +75,7 @@ export default function AppRoutes() {
 
 
           {/*search page*/}
-          {/* <Route path="/search" element={<SearchPage />} /> */}
+          <Route path="/search" element={<SearchPage />} />
 
           {/* SHOPPING */}
           <Route path="/cart" element={<Cart />} />
