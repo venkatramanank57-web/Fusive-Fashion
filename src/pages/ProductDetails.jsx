@@ -1,6 +1,7 @@
 // =====================================
 // ProductDetails.jsx
 // Fixed: Wishlist and Cart have separate toast notifications
+// Added: Redux integration to store product globally with enhanced debug logs
 // =====================================
 
 import { useState, useEffect } from "react";
@@ -11,6 +12,7 @@ import { ShoppingBag, Heart, HeartOff, Share2, Tag } from "lucide-react";
 import { GET_PRODUCT_BY_HANDLE } from "../api/shopify/products";
 import { addToCart } from "../features/cart/cartSlice";
 import { toggleWishlist } from "../features/wishlist/wishlistSlice";
+import { setCurrentProduct } from "../features/product/productSlice";
 import ProductMedia from "../components/ProductMedia";
 import Toast from "../components/Toast";
 
@@ -18,6 +20,9 @@ export default function ProductDetails() {
   const { handle } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // Get current product from Redux to verify it's stored
+  const currentProduct = useSelector((state) => state.product.currentProduct);
 
   // State
   const [toast, setToast] = useState({
@@ -41,6 +46,73 @@ export default function ProductDetails() {
     GET_PRODUCT_BY_HANDLE,
     { variables: { handle } }
   );
+
+  // ENHANCED DEBUG: Store product in Redux with full object and check collections
+  useEffect(() => {
+    if (data?.productByHandle) {
+      const product = data.productByHandle;
+      
+      console.log("========== 🔍 PRODUCT DATA DEBUG ==========");
+      console.log("📦 FULL product from API:", product);
+      
+      // Check for collections in different possible locations
+      console.log("🔍 Checking for collections:");
+      console.log("  - Top level collections:", product.collections);
+      console.log("  - collections.edges:", product.collections?.edges);
+      console.log("  - collections.nodes:", product.collections?.nodes);
+      
+      // Log all top-level keys to see what's available
+      console.log("📋 All top-level keys in product:", Object.keys(product));
+      
+      // Log the structure if collections exists
+      if (product.collections) {
+        console.log("📚 Collections structure:", JSON.stringify(product.collections, null, 2));
+      } else {
+        console.log("❌ No collections field found at top level");
+        
+        // Check if collections might be nested elsewhere
+        if (product.variants?.edges?.[0]?.node?.collections) {
+          console.log("✅ Found collections in variants!");
+        }
+      }
+      
+      // Dispatch the FULL product object to Redux
+      console.log("⏳ Dispatching full product to Redux...");
+      dispatch(setCurrentProduct(product));
+      console.log("✅ Dispatched setCurrentProduct to Redux");
+    }
+  }, [data, dispatch]);
+
+  // ENHANCED DEBUG: Log when currentProduct changes in Redux
+  useEffect(() => {
+    if (currentProduct) {
+      console.log("========== 🔄 REDUX STORE UPDATED ==========");
+      console.log("🔄 Redux store now has product:", {
+        id: currentProduct.id,
+        title: currentProduct.title,
+        handle: currentProduct.handle
+      });
+      
+      // Check if collections made it to Redux
+      console.log("🔍 Checking collections in Redux:");
+      console.log("  - Collections in Redux:", currentProduct.collections);
+      
+      if (currentProduct.collections) {
+        console.log("✅ Collections successfully stored in Redux!");
+        console.log("📚 Collections data:", currentProduct.collections);
+      } else {
+        console.log("❌ Collections still missing in Redux!");
+        console.log("⚠️ This means either:");
+        console.log("   1. API didn't return collections (but Postman says it does)");
+        console.log("   2. Collections is nested differently in the response");
+        console.log("   3. Product slice is filtering the data");
+      }
+      
+      // Log all keys in Redux product
+      console.log("📋 Keys in Redux product:", Object.keys(currentProduct));
+      console.log("==========================================");
+    }
+  }, [currentProduct]);
 
   // Check if current product variant is in wishlist
   const currentVariantId = selectedVariant?.id || data?.productByHandle?.variants?.edges[0]?.node?.id;
@@ -231,14 +303,17 @@ export default function ProductDetails() {
     }
   };
 
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-baltic"></div>
-    </div>
-  );
+  if (loading) {
+    console.log("⏳ Loading product...");
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-baltic"></div>
+      </div>
+    );
+  }
   
   if (error) {
-    console.error("GraphQL error:", error);
+    console.error("❌ GraphQL error:", error);
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-red-600">Error loading product: {error.message}</p>
@@ -246,14 +321,28 @@ export default function ProductDetails() {
     );
   }
   
-  if (!data?.productByHandle) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <p>Product not found</p>
-    </div>
-  );
+  if (!data?.productByHandle) {
+    console.log("❌ Product not found for handle:", handle);
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Product not found</p>
+      </div>
+    );
+  }
 
   const product = data.productByHandle;
   
+  // Basic product data structure log
+  console.log("📊 Product data structure:", {
+    hasMedia: !!product.media,
+    mediaCount: product.media?.edges?.length || 0,
+    hasVariants: !!product.variants,
+    variantsCount: product.variants?.edges?.length || 0,
+    hasOptions: !!product.options,
+    optionsCount: product.options?.length || 0,
+    hasCollections: !!product.collections
+  });
+
   // Get product options
   const options = product.options || [];
   const colorOption = options.find(opt => 
@@ -748,4 +837,4 @@ export default function ProductDetails() {
       </div>
     </div>
   );
-} 
+}

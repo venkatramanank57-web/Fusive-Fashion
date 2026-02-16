@@ -81,7 +81,7 @@ export default function SearchPage() {
 
   return (
     <>
-    <div className="w-full px-4 sm:px-6 md:px-12 lg:px-20 py-8 sm:py-12 bg-white">
+    <div className="w-full px-4 sm:px-6 md:px-12 lg:px-20 py-8 sm:py-12 bg-white z-10 relative">
       {/* 🔥 Header */}
       <div className="mb-8 sm:mb-12">
         {/* Title Row */}

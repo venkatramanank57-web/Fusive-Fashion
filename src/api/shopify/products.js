@@ -1,7 +1,9 @@
 import { gql } from "@apollo/client";
 
 
-//get all products
+// ===============================
+// GET ALL PRODUCTS
+// ===============================
 export const GET_PRODUCTS = gql`
   query GetProducts {
     products(first: 102) {
@@ -11,13 +13,27 @@ export const GET_PRODUCTS = gql`
           title
           handle
           featuredImage {
-            url(transform: { maxWidth: 1539, maxHeight: 2310, crop: CENTER, preferredContentType: WEBP })
+            url(
+              transform: {
+                maxWidth: 1539
+                maxHeight: 2310
+                crop: CENTER
+                preferredContentType: WEBP
+              }
+            )
             altText
           }
           images(first: 5) {
             edges {
               node {
-                url(transform: { maxWidth: 1539, maxHeight: 2310, crop: CENTER, preferredContentType: WEBP })
+                url(
+                  transform: {
+                    maxWidth: 1539
+                    maxHeight: 2310
+                    crop: CENTER
+                    preferredContentType: WEBP
+                  }
+                )
                 altText
               }
             }
@@ -37,7 +53,14 @@ export const GET_PRODUCTS = gql`
                   value
                 }
                 image {
-                  url(transform: { maxWidth: 1539, maxHeight: 2310, crop: CENTER, preferredContentType: WEBP })
+                  url(
+                    transform: {
+                      maxWidth: 1539
+                      maxHeight: 2310
+                      crop: CENTER
+                      preferredContentType: WEBP
+                    }
+                  )
                   altText
                 }
               }
@@ -50,7 +73,10 @@ export const GET_PRODUCTS = gql`
 `;
 
 
-// get single product all details 
+// ===============================
+// GET SINGLE PRODUCT (FULL DETAILS)
+// ⭐ COLLECTIONS ADDED (VERY IMPORTANT)
+// ===============================
 export const GET_PRODUCT_BY_HANDLE = gql`
   query GetProductByHandle($handle: String!) {
     productByHandle(handle: $handle) {
@@ -62,25 +88,36 @@ export const GET_PRODUCT_BY_HANDLE = gql`
       vendor
       productType
       tags
-      
+
+      # ⭐ THIS FIELD WAS MISSING (MAIN BUG)
+      collections(first: 5) {
+        edges {
+          node {
+            id
+            title
+            handle
+          }
+        }
+      }
+
       options {
         id
         name
         values
       }
-      
+
       priceRange {
         minVariantPrice {
           amount
           currencyCode
         }
       }
-      
+
       featuredImage {
         url
         altText
       }
-      
+
       media(first: 10) {
         edges {
           node {
@@ -110,7 +147,7 @@ export const GET_PRODUCT_BY_HANDLE = gql`
           }
         }
       }
-      
+
       variants(first: 20) {
         edges {
           node {
@@ -132,6 +169,37 @@ export const GET_PRODUCT_BY_HANDLE = gql`
             image {
               url
               altText
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+
+// ===============================
+// GET PRODUCTS FROM SAME COLLECTION
+// (RELATED PRODUCTS)
+// ===============================
+export const GET_COLLECTION_PRODUCTS = gql`
+  query GetCollectionProducts($handle: String!) {
+    collection(handle: $handle) {
+      products(first: 12) {
+        edges {
+          node {
+            id
+            title
+            handle
+            featuredImage {
+              url
+              altText
+            }
+            priceRange {
+              minVariantPrice {
+                amount
+                currencyCode
+              }
             }
           }
         }
