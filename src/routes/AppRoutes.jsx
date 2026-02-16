@@ -29,7 +29,7 @@ import ShopByCollections from "../pages/ShopByCollections"
 import SearchPage from "../pages/SearchPage";
 import Cart from "../pages/Cart";
 import WishlistPage from "../pages/WishlistPage";
-import Checkout from "../pages/Checkout";
+
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Account from "../pages/Account";
@@ -80,7 +80,7 @@ export default function AppRoutes() {
           {/* SHOPPING */}
           <Route path="/cart" element={<Cart />} />
           <Route path="/wishlist" element={<WishlistPage />} />
-          <Route path="/checkout" element={<Checkout />} />
+         
 
  
           {/* look book page */}
@@ -97,7 +97,7 @@ export default function AppRoutes() {
 
           {/* POLICIES */}
           <Route path="/policy/:type" element={<PoliciesPage />} />
-          <Route path="/contact" element={<ContactPage />} />
+          {/* <Route path="/contact" element={<ContactPage />} /> */}
 
           {/*Fqa page*/}
           <Route path="/faq" element={<FAQPage />} />
