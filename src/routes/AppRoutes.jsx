@@ -100,7 +100,7 @@ export default function AppRoutes() {
           {/* <Route path="/contact" element={<ContactPage />} /> */}
 
           {/*Fqa page*/}
-          <Route path="/faq" element={<FAQPage />} />
+          {/* <Route path="/faq" element={<FAQPage />} /> */}
 {/* 
           <Route
             path="/privacy-policy"
