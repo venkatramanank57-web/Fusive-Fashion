@@ -1,4 +1,30 @@
+/* IMPORTANT — fix footer flash */
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+/* App layout wrapper */
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* main content grows */
+.main-content {
+  flex: 1;
+}
+
+
+
+
 /* src/index.css */
+
 
 @tailwind base;
 @tailwind components;

@@ -84,10 +84,10 @@ export default function AppRoutes() {
 
  
           {/* look book page */}
-          {/* <Route path="/lookbook" element={<Lookbook />} />  */}
+          <Route path="/lookbook" element={<Lookbook />} /> 
 
           {/*About us page */}
-          {/* <Route path="/about" element={<About />} /> */}
+          <Route path="/about" element={<About />} />
 
 
 
@@ -97,10 +97,10 @@ export default function AppRoutes() {
 
           {/* POLICIES */}
           <Route path="/policy/:type" element={<PoliciesPage />} />
-          {/* <Route path="/contact" element={<ContactPage />} /> */}
+          <Route path="/contact" element={<ContactPage />} />
 
           {/*Fqa page*/}
-          {/* <Route path="/faq" element={<FAQPage />} /> */}
+          <Route path="/faq" element={<FAQPage />} />
 {/* 
           <Route
             path="/privacy-policy"

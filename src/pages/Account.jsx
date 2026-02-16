@@ -4,7 +4,7 @@
 // Customer account dashboard with profile picture
 // Shows orders, profile, address book
 // Logout functionality
-// FULLY FUNCTIONAL CHANGE PASSWORD
+// FULLY FUNCTIONAL CHANGE PASSWORD with auto-logout
 // =====================================
 
 import { useState, useEffect, useRef } from "react";
@@ -337,11 +337,18 @@ export default function Account() {
     }, 3000);
   };
 
+  // ✅ IMPROVED: Ensure localStorage is cleared on logout
   const handleLogout = () => {
     // Clear profile picture from localStorage on logout
     if (profile?.id) {
       localStorage.removeItem(`profile_picture_${profile.id}`);
     }
+    
+    // Clear all auth tokens
+    localStorage.removeItem("customerToken");
+    localStorage.removeItem("tokenExpiry");
+    localStorage.removeItem("login_success");
+    
     dispatch(logout());
     showToast("Logged out successfully", "success");
     
@@ -429,7 +436,7 @@ export default function Account() {
     }
   };
 
-  // ✅ CORRECTED: Password update - Shopify doesn't verify current password
+  // ✅ IMPROVED: Password update with auto-logout
   const handleUpdatePassword = async (e) => {
     e.preventDefault();
     
@@ -477,10 +484,21 @@ export default function Account() {
         form.reset();
         setShowPasswordForm(false);
         
-        // Show logout message after password change
+        // Show message about logout
         setTimeout(() => {
           showToast("Please log in again with your new password", "info");
         }, 1000);
+        
+        // ✅ AUTO-LOGOUT after password change (Shopify recommended)
+        setTimeout(() => {
+          if (isMounted.current) {
+            // Clear all auth tokens
+            localStorage.removeItem("customerToken");
+            localStorage.removeItem("tokenExpiry");
+            dispatch(logout());
+            navigate('/login');
+          }
+        }, 3000);
         
       } else if (result.data?.customerUpdate?.customerUserErrors?.length > 0) {
         // Handle specific error messages
@@ -509,7 +527,7 @@ export default function Account() {
     fetchCustomerData();
   };
 
-  // ⭐ Open Shopify Order Status page (no OTP/login required)
+  // ✅ CORRECT: Open Shopify Order Status page (no OTP/login required)
   const handleViewOrderDetails = (statusUrl, e) => {
     e.preventDefault();
 
@@ -1452,7 +1470,6 @@ export default function Account() {
                         </div>
                         
                         <div className="mt-6 flex gap-2">
-                          {/* "Set as Default" button REMOVED - Shopify Storefront API limitation */}
                           <button
                             onClick={() => openEditAddressModal(address)}
                             className="px-3 py-1 text-xs border border-baltic text-baltic rounded hover:bg-baltic hover:text-white transition-colors"
@@ -1473,7 +1490,7 @@ export default function Account() {
               </div>
             )}
 
-            {/* Settings Tab - with FULLY FUNCTIONAL Password Change */}
+            {/* Settings Tab - with FULLY FUNCTIONAL Password Change + Auto-Logout */}
             {activeTab === "settings" && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-medium text-gray-900 mb-6">Account Settings</h2>
@@ -1633,7 +1650,7 @@ export default function Account() {
                     </div>
                   </div>
 
-                  {/* ✅ FULLY FUNCTIONAL Password Change - CORRECTED */}
+                  {/* ✅ FULLY FUNCTIONAL Password Change - CORRECTED with AUTO-LOGOUT */}
                   <div className="border rounded-lg p-6">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
@@ -1682,7 +1699,7 @@ export default function Account() {
                             />
                           </div>
                           <div className="text-xs text-amber-600 bg-amber-50 p-3 rounded-lg">
-                            <p>⚠️ <strong>Note:</strong> You'll be logged out after password change and need to log in again with your new password.</p>
+                            <p>⚠️ <strong>Important:</strong> You'll be automatically logged out after password change and need to log in again with your new password. This is a Shopify security requirement.</p>
                           </div>
                           <div className="flex gap-3 pt-4">
                             <button

@@ -1,7 +1,6 @@
 // =====================================
 // src/layouts/MainLayout.jsx
 // =====================================
-
 import { Outlet } from "react-router-dom";
 import StickyHeader from "../components/StickyHeader"; // Import the SUPER component
 import Footer from "../components/Footer";
@@ -15,7 +14,7 @@ export default function MainLayout() {
 
       {/* Page-specific content */}
       <main className="flex-1 pb-[800px]">
-        <Outlet />
+        <Outlet /> 
       </main> 
 
       {/* Footer ALWAYS after page content   -5 */}

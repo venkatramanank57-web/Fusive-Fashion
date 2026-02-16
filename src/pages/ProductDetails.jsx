@@ -2,17 +2,20 @@
 // ProductDetails.jsx
 // Fixed: Wishlist and Cart have separate toast notifications
 // Added: Redux integration to store product globally with enhanced debug logs
+// Added: Buy Now functionality with direct checkout
 // =====================================
 
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@apollo/client/react";
+import { useQuery, useMutation } from "@apollo/client/react";
 import { ShoppingBag, Heart, HeartOff, Share2, Tag } from "lucide-react";
 import { GET_PRODUCT_BY_HANDLE } from "../api/shopify/products";
+import { CREATE_CART_WITH_ITEMS } from "../api/shopify/cart";
 import { addToCart } from "../features/cart/cartSlice";
 import { toggleWishlist } from "../features/wishlist/wishlistSlice";
 import { setCurrentProduct } from "../features/product/productSlice";
+import { setCart } from "../features/cart/cartSlice";
 import ProductMedia from "../components/ProductMedia";
 import Toast from "../components/Toast";
 
@@ -30,6 +33,7 @@ export default function ProductDetails() {
     message: "",
     type: "success"
   });
+  const [isBuyNowLoading, setIsBuyNowLoading] = useState(false);
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -41,11 +45,13 @@ export default function ProductDetails() {
   // Redux state
   const wishlistItems = useSelector((state) => state.wishlist.items);
   
-  // GraphQL query
+  // GraphQL queries and mutations
   const { data, loading, error } = useQuery(
     GET_PRODUCT_BY_HANDLE,
     { variables: { handle } }
   );
+  
+  const [createCartWithItemsMutation] = useMutation(CREATE_CART_WITH_ITEMS);
 
   // ENHANCED DEBUG: Store product in Redux with full object and check collections
   useEffect(() => {
@@ -303,62 +309,6 @@ export default function ProductDetails() {
     }
   };
 
-  if (loading) {
-    console.log("⏳ Loading product...");
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-baltic"></div>
-      </div>
-    );
-  }
-  
-  if (error) {
-    console.error("❌ GraphQL error:", error);
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-600">Error loading product: {error.message}</p>
-      </div>
-    );
-  }
-  
-  if (!data?.productByHandle) {
-    console.log("❌ Product not found for handle:", handle);
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Product not found</p>
-      </div>
-    );
-  }
-
-  const product = data.productByHandle;
-  
-  // Basic product data structure log
-  console.log("📊 Product data structure:", {
-    hasMedia: !!product.media,
-    mediaCount: product.media?.edges?.length || 0,
-    hasVariants: !!product.variants,
-    variantsCount: product.variants?.edges?.length || 0,
-    hasOptions: !!product.options,
-    optionsCount: product.options?.length || 0,
-    hasCollections: !!product.collections
-  });
-
-  // Get product options
-  const options = product.options || [];
-  const colorOption = options.find(opt => 
-    opt.name.toLowerCase().includes('color') || 
-    opt.name.toLowerCase().includes('colour')
-  );
-  const sizeOption = options.find(opt => 
-    opt.name.toLowerCase().includes('size')
-  );
-
-  // Check if product has videos
-  const hasVideos = filteredMedia.some(media => 
-    media.mediaContentType === "VIDEO" || 
-    media.mediaContentType === "EXTERNAL_VIDEO"
-  );
-
   // Handle Add to Cart - shows CART toast
   const handleAddToCart = () => {
     if (!selectedVariant) {
@@ -417,6 +367,142 @@ export default function ProductDetails() {
       </div>,
       "success"
     );
+  };
+
+  // Handle Buy Now - Direct checkout
+  const handleBuyNow = async () => {
+    if (!selectedVariant) {
+      showToast("Please select a variant", "error");
+      return;
+    }
+
+    if (!selectedVariant.availableForSale) {
+      showToast("This variant is out of stock", "error");
+      return;
+    }
+
+    setIsBuyNowLoading(true);
+
+    try {
+      console.log("🚀 Processing Buy Now for:", {
+        variantId: selectedVariant.id,
+        title: product.title,
+        color: selectedColor,
+        size: selectedSize
+      });
+
+      // First, add the item to cart in Redux
+      dispatch(
+        addToCart({
+          productId: product.id,
+          variantId: selectedVariant.id,
+          title: product.title,
+          price: Number(selectedVariant.price.amount),
+          compareAtPrice: selectedVariant.compareAtPrice ? 
+            Number(selectedVariant.compareAtPrice.amount) : null,
+          quantity: 1,
+          image: selectedVariant.image?.url || product.featuredImage?.url || "",
+          altText: selectedVariant.image?.altText || product.title,
+          size: selectedSize || "",
+          color: selectedColor || "",
+          handle: product.handle,
+        })
+      );
+
+      // Show loading toast
+      showToast("Preparing checkout...", "info");
+
+      // Create a Shopify cart with just this item
+      const result = await createCartWithItemsMutation({
+        variables: {
+          input: {
+            lines: [
+              {
+                merchandiseId: selectedVariant.id,
+                quantity: 1,
+                attributes: [
+                  ...(selectedColor ? [{ key: 'Color', value: selectedColor }] : []),
+                  ...(selectedSize ? [{ key: 'Size', value: selectedSize }] : [])
+                ]
+              }
+            ]
+          }
+        }
+      });
+
+      console.log("📦 Shopify cart creation result:", result);
+
+      if (result.data?.cartCreate?.cart) {
+        const cartData = result.data.cartCreate.cart;
+        const checkoutUrl = cartData.checkoutUrl;
+        
+        console.log("✅ Checkout URL created:", checkoutUrl);
+
+        // Save cart info to Redux
+        dispatch(setCart({
+          cartId: cartData.id,
+          checkoutUrl: checkoutUrl
+        }));
+
+        // Show success message
+        showToast("Redirecting to checkout...", "success");
+
+        // Small delay to show the toast before redirect
+        setTimeout(() => {
+          // Redirect to checkout in new tab
+          window.open(checkoutUrl, '_blank');
+          
+          // Optional: Navigate to cart page as a fallback
+          // navigate("/cart");
+        }, 1000);
+        
+      } else if (result.data?.cartCreate?.userErrors?.length > 0) {
+        const error = result.data.cartCreate.userErrors[0];
+        console.error("❌ Shopify error:", error);
+        throw new Error(error.message);
+      } else {
+        throw new Error("Failed to create checkout");
+      }
+    } catch (error) {
+      console.error("❌ Buy now error:", error);
+      showToast(error.message || "Failed to process buy now", "error");
+    } finally {
+      setIsBuyNowLoading(false);
+    }
+  };
+
+  // Alternative: Simple Buy Now that just navigates to cart
+  const handleSimpleBuyNow = () => {
+    if (!selectedVariant) {
+      showToast("Please select a variant", "error");
+      return;
+    }
+
+    if (!selectedVariant.availableForSale) {
+      showToast("This variant is out of stock", "error");
+      return;
+    }
+
+    // Add to cart
+    dispatch(
+      addToCart({
+        productId: product.id,
+        variantId: selectedVariant.id,
+        title: product.title,
+        price: Number(selectedVariant.price.amount),
+        compareAtPrice: selectedVariant.compareAtPrice ? 
+          Number(selectedVariant.compareAtPrice.amount) : null,
+        quantity: 1,
+        image: selectedVariant.image?.url || product.featuredImage?.url || "",
+        altText: selectedVariant.image?.altText || product.title,
+        size: selectedSize || "",
+        color: selectedColor || "",
+        handle: product.handle,
+      })
+    );
+
+    // Navigate to cart - cart page will handle checkout
+    navigate("/cart");
   };
 
   // Helper function to convert color names to hex values
@@ -560,6 +646,62 @@ export default function ProductDetails() {
       </span>
     );
   };
+
+  if (loading) {
+    console.log("⏳ Loading product...");
+    return (
+      <div className="min-h-screen flex items-center justify-center relative z-10">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-baltic"></div>
+      </div>
+    );
+  }
+  
+  if (error) {
+    console.error("❌ GraphQL error:", error);
+    return (
+      <div className="min-h-screen flex items-center justify-center relative z-10">
+        <p className="text-red-600">Error loading product: {error.message}</p>
+      </div>
+    );
+  }
+  
+  if (!data?.productByHandle) {
+    console.log("❌ Product not found for handle:", handle);
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Product not found</p>
+      </div>
+    );
+  }
+
+  const product = data.productByHandle;
+  
+  // Basic product data structure log
+  console.log("📊 Product data structure:", {
+    hasMedia: !!product.media,
+    mediaCount: product.media?.edges?.length || 0,
+    hasVariants: !!product.variants,
+    variantsCount: product.variants?.edges?.length || 0,
+    hasOptions: !!product.options,
+    optionsCount: product.options?.length || 0,
+    hasCollections: !!product.collections
+  });
+
+  // Get product options
+  const options = product.options || [];
+  const colorOption = options.find(opt => 
+    opt.name.toLowerCase().includes('color') || 
+    opt.name.toLowerCase().includes('colour')
+  );
+  const sizeOption = options.find(opt => 
+    opt.name.toLowerCase().includes('size')
+  );
+
+  // Check if product has videos
+  const hasVideos = filteredMedia.some(media => 
+    media.mediaContentType === "VIDEO" || 
+    media.mediaContentType === "EXTERNAL_VIDEO"
+  );
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen bg-white z-10">
@@ -749,15 +891,22 @@ export default function ProductDetails() {
             </button>
 
             <button
-              onClick={handleAddToCart}
-              disabled={!selectedVariant || !selectedVariant.availableForSale}
-              className={`w-full py-3 px-6 rounded-md border transition-all ${
+              onClick={handleBuyNow}
+              disabled={!selectedVariant || !selectedVariant.availableForSale || isBuyNowLoading}
+              className={`w-full py-3 px-6 rounded-md border transition-all flex items-center justify-center gap-2 ${
                 selectedVariant && selectedVariant.availableForSale
                   ? "border-baltic text-baltic hover:bg-gray-50"
                   : "border-gray-300 text-gray-400 cursor-not-allowed"
               }`}
             >
-              Buy Now
+              {isBuyNowLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-baltic"></div>
+                  Processing...
+                </>
+              ) : (
+                "Buy Now"
+              )}
             </button>
           </div>
 
