@@ -1,6 +1,7 @@
 // =====================================
 // src/pages/Register.jsx
 // Clean Card Layout with Inner Rounded Left Section
+// Shopify customer registration with ANTI-SPAM protection
 // =====================================
 
 import { useState } from "react";
@@ -22,6 +23,9 @@ import {
 } from "../features/customer/customerSlice";
 
 import Toast from "../components/Toast";
+
+// 🛡️ Anti-spam cooldown timer for registration
+let lastRegisterTime = 0;
 
 export default function Register() {
   const dispatch = useDispatch();
@@ -63,8 +67,21 @@ export default function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
 
+    // 🛑 ANTI-SPAM: 10 second cooldown between registration attempts
+    // Registration is more sensitive than login, so longer cooldown
+    const now = Date.now();
+    if (now - lastRegisterTime < 10000) {
+      showToast("Please wait 10 seconds before trying again", "error");
+      return;
+    }
+    lastRegisterTime = now;
+
+    // 🛑 Prevent double submission while loading
+    if (loading) return;
+
     const { fullName, email, password } = formData;
 
+    // ✅ Form validation
     if (!fullName || !email || !password) {
       return showToast("All fields are required", "error");
     }
@@ -104,6 +121,7 @@ export default function Register() {
         return showToast(errorMsg, "error");
       }
 
+      // Auto-login after successful registration
       const loginResponse = await loginMutation({
         variables: { input: { email, password } }
       });
@@ -133,8 +151,9 @@ export default function Register() {
       setTimeout(() => navigate("/account"), 1000);
 
     } catch (err) {
+      console.error("Registration error:", err);
       dispatch(setError(err.message));
-      showToast("Registration failed. Try again.", "error");
+      showToast("Registration failed. Please try again later.", "error");
     } finally {
       dispatch(setLoading(false));
     }
@@ -248,6 +267,15 @@ export default function Register() {
               >
                 Sign in
               </Link>
+            </div>
+
+            <div className="mt-6 text-center">
+              <p className="text-xs text-gray-400">
+                By creating an account, you agree to our{" "}
+                <Link to="/terms" className="text-indigo-600 hover:underline">Terms</Link>{" "}
+                and{" "}
+                <Link to="/privacy" className="text-indigo-600 hover:underline">Privacy Policy</Link>
+              </p>
             </div>
             
           </div>

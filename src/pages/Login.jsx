@@ -2,7 +2,7 @@
 // src/pages/Login.jsx
 // Clean Card Layout with Inner Rounded Left Section
 // Shopify customer authentication
-// Form validation
+// Form validation with ANTI-SPAM protection
 // =====================================
 
 import { useState } from "react";
@@ -13,6 +13,9 @@ import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import { CUSTOMER_LOGIN } from "../api/shopify/customer";
 import { loginSuccess, setLoading, setError, clearError } from "../features/customer/customerSlice";
 import Toast from "../components/Toast";
+
+// 🛡️ Anti-spam cooldown timer
+let lastLoginTime = 0;
 
 export default function Login() {
   const dispatch = useDispatch();
@@ -50,7 +53,19 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    
+
+    // 🛑 ANTI-SPAM: 5 second cooldown between attempts
+    const now = Date.now();
+    if (now - lastLoginTime < 5000) {
+      showToast("Please wait 5 seconds before trying again", "error");
+      return;
+    }
+    lastLoginTime = now;
+
+    // 🛑 Prevent double submission while loading
+    if (loading) return;
+
+    // ✅ Form validation
     if (!formData.email || !formData.password) {
       showToast("Please fill in all fields", "error");
       return;
@@ -100,7 +115,7 @@ export default function Login() {
     } catch (error) {
       console.error("Login error:", error);
       dispatch(setError(error.message));
-      showToast(error.message || "Login failed. Please try again.", "error");
+      showToast("Too many attempts. Please try again later.", "error");
     } finally {
       dispatch(setLoading(false));
     }
