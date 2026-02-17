@@ -1,23 +1,19 @@
-// =====================================
-// src/layouts/MainLayout.jsx
-// =====================================
 import { Outlet } from "react-router-dom";
-import StickyHeader from "../components/StickyHeader"; // Import the SUPER component
+import StickyHeader from "../components/StickyHeader";
 import Footer from "../components/Footer";
 import CookieConsent from "../components/CookieConsent";
+import FooterSpacer from "../components/FooterSpacer";
 
 export default function MainLayout() {
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Use the SUPER component instead of separate components */}
       <StickyHeader />
 
-      {/* Page-specific content */}
-      <main className="flex-1 pb-[800px]">
-        <Outlet /> 
-      </main> 
+      <main className="flex-1  relative z-20">
+        <Outlet />
+        <FooterSpacer />   {/* ⭐ IMPORTANT */}
+      </main>
 
-      {/* Footer ALWAYS after page content   -5 */}
       <Footer />
       <CookieConsent />
     </div>

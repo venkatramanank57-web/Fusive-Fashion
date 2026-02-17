@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import HeroSection from "../components/Home/HeroSection";
 import Bestseller from "../components/Home/Bestseller";
 import FeaturedCollections from "../components/Home/FeaturedCollections";
@@ -14,27 +14,38 @@ import PressSlider from "../components/Home/PressSlider";
 import InstagramSection from "../components/Home/InstagramSection";
 import FeaturesBanner from "../components/common/FeaturesBanner";
 import NewsletterSection from "../components/common/NewsletterSection";
+import HomeSkeleton from "../components/skeleton/HomeSkeleton";
 
 function Home() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 800); // simulate loading
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) return <HomeSkeleton />;
+
   return (
-     <div className="bg-white  relative z-10">
-      {/* Hero stays fixed */}
-      <HeroSection />         {/* slide-1 */}
-      <Bestseller />          {/* slide-2 */}
-      <FeaturedCollections /> {/* slide-3 */}
-      <CuratedCollection />   {/* slide-4 */}
-      <ShoppableVideo />      {/* slide-5 */}
-      <CampaignSection />     {/* slide-6 */}
-      <ParallaxSaleSection/>  {/* slide-7 */}
-      <SplitImageVideoSection/>{/* slide-8 */}
-      <InspirationReels/>     {/* slide-9 */}
-      <BrandsMarquee/>        {/* slide-10 */}
-      <JournalSection/>       {/* slide-11 */}
-      <PressSlider/>          {/* slide-12 */}
-      <InstagramSection/>     {/* slide-13 */}
-      <FeaturesBanner/>       {/* slide-14 */}
-      <NewsletterSection/>    {/* slide-15 */}
-   
+    <div className="bg-white relative z-10">
+      <HeroSection />
+      <Bestseller />
+      <FeaturedCollections />
+      <CuratedCollection />
+      <ShoppableVideo />
+      <CampaignSection />
+      <ParallaxSaleSection />
+      <SplitImageVideoSection />
+      <InspirationReels />
+      <BrandsMarquee />
+      <JournalSection />
+      <PressSlider />
+      <InstagramSection />
+      <FeaturesBanner />
+      <NewsletterSection />
     </div>
   );
 }

@@ -275,3 +275,10 @@ body {
 .animate-slide-in {
   animation: slide-in 0.25s ease-out;
 }
+
+
+
+/* ===== PRODUCTION FIX FOR MOBILE SCROLL CONFLICT ===== */
+html, body {
+  overscroll-behavior-y: none;
+}

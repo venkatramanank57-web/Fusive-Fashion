@@ -8,6 +8,7 @@ export default function CollectionSlider({ title, query, variables }) {
 
   const scrollRef = useRef(null);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isScrolling, setIsScrolling] = useState(false);
 
   // Shopify response normalize
   const products =
@@ -28,27 +29,43 @@ export default function CollectionSlider({ title, query, variables }) {
   const totalSlides = Math.ceil(products.length / itemsPerSlide);
 
   const scrollToSlide = (index) => {
-    if (!scrollRef.current) return;
+    if (!scrollRef.current || isScrolling) return;
+    
+    setIsScrolling(true);
     const container = scrollRef.current;
     const slideWidth = container.offsetWidth;
+    
     container.scrollTo({ left: slideWidth * index, behavior: "smooth" });
     setCurrentSlide(index);
+    
+    // Allow next scroll after animation completes
+    setTimeout(() => {
+      setIsScrolling(false);
+    }, 400); // Match this with smooth scroll duration
   };
 
   const nextSlide = () => {
-    if (currentSlide < totalSlides - 1) scrollToSlide(currentSlide + 1);
+    if (currentSlide < totalSlides - 1 && !isScrolling) {
+      scrollToSlide(currentSlide + 1);
+    }
   };
 
   const prevSlide = () => {
-    if (currentSlide > 0) scrollToSlide(currentSlide - 1);
+    if (currentSlide > 0 && !isScrolling) {
+      scrollToSlide(currentSlide - 1);
+    }
   };
 
   const handleScroll = () => {
     const container = scrollRef.current;
-    if (!container) return;
+    if (!container || isScrolling) return;
+    
     const slideWidth = container.offsetWidth;
     const newSlide = Math.round(container.scrollLeft / slideWidth);
-    setCurrentSlide(newSlide);
+    
+    if (newSlide !== currentSlide) {
+      setCurrentSlide(newSlide);
+    }
   };
 
   if (loading) return null;
@@ -71,8 +88,10 @@ export default function CollectionSlider({ title, query, variables }) {
           {currentSlide > 0 && (
             <button
               onClick={prevSlide}
-              className="hidden md:flex absolute -left-12 lg:-left-16 top-1/2 -translate-y-1/2 
-                         z-20 bg-white shadow-xl p-3 rounded-full hover:scale-110 transition"
+              disabled={isScrolling}
+              className={`hidden md:flex absolute -left-12 lg:-left-16 top-1/2 -translate-y-1/2 
+                         z-20 bg-white shadow-xl p-3 rounded-full hover:scale-110 transition
+                         ${isScrolling ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <ChevronLeft />
             </button>
@@ -82,8 +101,10 @@ export default function CollectionSlider({ title, query, variables }) {
           {currentSlide < totalSlides - 1 && (
             <button
               onClick={nextSlide}
-              className="hidden md:flex absolute -right-12 lg:-right-16 top-1/2 -translate-y-1/2 
-                         z-20 bg-white shadow-xl p-3 rounded-full hover:scale-110 transition"
+              disabled={isScrolling}
+              className={`hidden md:flex absolute -right-12 lg:-right-16 top-1/2 -translate-y-1/2 
+                         z-20 bg-white shadow-xl p-3 rounded-full hover:scale-110 transition
+                         ${isScrolling ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <ChevronRight />
             </button>

@@ -1,7 +1,7 @@
 // =====================================
 // HeroSection.jsx
 // Desktop → 2-Phase Parallax (NO WHITE GAP)
-// Mobile → Normal Static Hero
+// Mobile → Normal Static Hero (100dvh FIX)
 // =====================================
 
 import { Link } from "react-router-dom";
@@ -27,18 +27,16 @@ export default function HeroSection() {
     if (isMobile) return;
 
     const heroHeight = window.innerHeight;
-    const imageExtraScroll = heroHeight * 0.6; // first 50vh scroll = image only
+    const imageExtraScroll = heroHeight * 0.6;
 
     const handleScroll = () => {
       const scrollY = window.scrollY;
 
-      // Phase 1 → image parallax
       const imageScroll = Math.min(scrollY, imageExtraScroll);
       if (imageRef.current) {
         imageRef.current.style.transform = `translateY(-${imageScroll}px)`;
       }
 
-      // Phase 2 → hero moves AFTER image finished
       let heroMove = 0;
       if (scrollY > imageExtraScroll) {
         heroMove = scrollY - imageExtraScroll;
@@ -54,13 +52,13 @@ export default function HeroSection() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isMobile]);
 
-  // ⭐ MOBILE HERO (normal section)
+  // ⭐ MOBILE HERO (100dvh FIXED)
   if (isMobile) {
     return (
-      <section className="relative h-screen w-full overflow-hidden z-10">
+      <section className="relative h-[100dvh] w-full overflow-hidden z-10">
         <img
           src="//wonder-theme-fashion.myshopify.com/cdn/shop/files/3-velour-mobile-banner-main.jpg?v=1763505144&width=2000"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-[100dvh] object-cover"
           alt=""
         />
 
@@ -74,11 +72,11 @@ export default function HeroSection() {
 
         <div className="absolute inset-0 flex items-end justify-center pb-16 px-4">
           <div className="text-center max-w-xl">
-            <p className="text-white text-xs uppercase tracking-[0.3em] mb-4 font-primary">
+            <p className="text-white text-xs uppercase tracking-[0.3em] mb-4">
               Redefine Your Elegance
             </p>
 
-            <h1 className="text-white text-3xl font-bold mb-8 font-primary">
+            <h1 className="text-white text-3xl font-bold mb-8">
               Dresses you&apos;ll adore
             </h1>
 
@@ -101,7 +99,7 @@ export default function HeroSection() {
         ref={heroRef}
         className="fixed inset-0 h-screen w-full overflow-hidden z-10"
       >
-        {/* IMAGE MUST BE TALLER THAN SCROLL SPACE */}
+        {/* PARALLAX IMAGE */}
         <div
           ref={imageRef}
           className="absolute inset-0 w-full h-[150vh] will-change-transform"
@@ -122,20 +120,20 @@ export default function HeroSection() {
           </h1>
         </div>
 
-        {/* TEXT & BUTTON - ADJUSTED: Changed pb-24 to pb-32 for lower button position */}
-        <div className="absolute inset-0 flex items-end justify-center pb-32 px-4">
-          <div className="text-center max-w-3xl">
+        {/* RESPONSIVE TEXT POSITION */}
+        <div className="absolute inset-0 flex items-center justify-center px-4">
+          <div className="text-center max-w-3xl mt-[18vh]">
             <p className="text-white text-sm uppercase tracking-[0.3em] mb-6">
               Redefine Your Elegance
             </p>
 
-            <h1 className="text-white text-6xl font-bold mb-12">
+            <h1 className="text-white text-5xl lg:text-6xl xl:text-7xl font-bold mb-10">
               Dresses you&apos;ll adore
             </h1>
 
             <Link
               to="/collections/dress"
-              className="px-8 py-3 bg-white text-black rounded shadow-lg"
+              className="mt-2 px-8 py-3 bg-white text-black rounded shadow-lg"
             >
               Shop Dress
             </Link>
@@ -143,16 +141,8 @@ export default function HeroSection() {
         </div>
       </section>
 
-      {/* ⭐ FAKE SCROLL SPACE (must match hero scroll distance) */}
+      {/* SCROLL SPACE */}
       <div className="h-[130vh]" />
     </>
   );
 }
-
-
-
-
-
-
-
-

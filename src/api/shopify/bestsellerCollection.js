@@ -4,7 +4,7 @@ export const GET_BESTSELLERS = gql`
   query GetBestsellers {
     collection(handle: "bestseller") {
       title
-      products(first: 12) {
+      products(first: 50) {
         edges {
           node {
             id
