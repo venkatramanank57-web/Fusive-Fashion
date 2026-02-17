@@ -101,7 +101,7 @@ export default function InspirationReels() {
   }, [activeIndex, muted, paused]);
 
   return (
-    <section className="bg-[#f5f5f5] py-20 relative z-10">
+    <section className="bg-[#ffffff] py-20 relative z-10">
       <div className="text-center mb-14">
         <p className="uppercase tracking-[4px] text-gray-500 text-sm">
           Tik Tok

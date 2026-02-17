@@ -17,7 +17,7 @@ import NewsletterSection from "../components/common/NewsletterSection";
 
 function Home() {
   return (
-    <>
+     <div className="bg-white  relative z-10">
       {/* Hero stays fixed */}
       <HeroSection />         {/* slide-1 */}
       <Bestseller />          {/* slide-2 */}
@@ -34,8 +34,8 @@ function Home() {
       <InstagramSection/>     {/* slide-13 */}
       <FeaturesBanner/>       {/* slide-14 */}
       <NewsletterSection/>    {/* slide-15 */}
-
-    </>
+   
+    </div>
   );
 }
 

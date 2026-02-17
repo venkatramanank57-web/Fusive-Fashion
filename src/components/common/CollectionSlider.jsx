@@ -61,7 +61,7 @@ export default function CollectionSlider({ title, query, variables }) {
         {/* TITLE */}
         {title && (
           <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-semibold">{title}</h2>
+            <h2 className="text-3xl md:text-4xl font-semibold font-primary">{title}</h2>
           </div>
         )}
 

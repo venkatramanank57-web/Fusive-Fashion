@@ -10,7 +10,7 @@ export default function InstagramSection() {
   ];
 
   return (
-    <section className=" bg-white py-16 lg:py-20 overflow-hidden relative z-10">
+    <section className="bg-white py-16 lg:py-20 overflow-hidden relative z-10">
 
       {/* JOIN US TEXT */}
       <div className="text-center mb-10 lg:mb-14">
@@ -23,9 +23,8 @@ export default function InstagramSection() {
       </div>
 
       {/* MARQUEE */}
-      <div className="relative overflow-hidden">
-
-        <div className="flex gap-[4px] animate-brand-marquee">
+      <div className="relative overflow-hidden group">
+        <div className="flex gap-[4px] animate-brand-marquee group-hover:[animation-play-state:paused]">
           {[...images, ...images].map((img, i) => (
             <img
               key={i}
@@ -35,7 +34,6 @@ export default function InstagramSection() {
             />
           ))}
         </div>
-
       </div>
 
       {/* FOLLOW BUTTON */}

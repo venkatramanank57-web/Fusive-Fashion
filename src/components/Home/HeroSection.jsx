@@ -74,11 +74,11 @@ export default function HeroSection() {
 
         <div className="absolute inset-0 flex items-end justify-center pb-16 px-4">
           <div className="text-center max-w-xl">
-            <p className="text-white text-xs uppercase tracking-[0.3em] mb-4">
+            <p className="text-white text-xs uppercase tracking-[0.3em] mb-4 font-primary">
               Redefine Your Elegance
             </p>
 
-            <h1 className="text-white text-3xl font-bold mb-8">
+            <h1 className="text-white text-3xl font-bold mb-8 font-primary">
               Dresses you&apos;ll adore
             </h1>
 
@@ -148,3 +148,11 @@ export default function HeroSection() {
     </>
   );
 }
+
+
+
+
+
+
+
+

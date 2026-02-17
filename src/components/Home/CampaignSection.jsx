@@ -26,7 +26,7 @@ export default function CampaignSection() {
     },
   ];
 
-  /* mobile scroll */
+  // 👉 scroll to dot click
   const scrollToSlide = (index) => {
     const container = scrollRef.current;
     const width = container.offsetWidth;
@@ -34,6 +34,7 @@ export default function CampaignSection() {
     setCurrentSlide(index);
   };
 
+  // 👉 detect active slide while swiping
   const handleScroll = () => {
     const container = scrollRef.current;
     const slideWidth = container.offsetWidth;
@@ -55,13 +56,10 @@ export default function CampaignSection() {
 
       {/* ================= DESKTOP ================= */}
       <div className="hidden md:grid grid-cols-3 gap-10 max-w-[1500px] mx-auto px-10">
-
         {items.map((item, i) => (
           <Link key={i} to={item.link}>
-
             <div className="group">
 
-              {/* IMAGE */}
               <div className="overflow-hidden h-[560px]">
                 <img
                   src={item.img}
@@ -70,39 +68,37 @@ export default function CampaignSection() {
                 />
               </div>
 
-              {/* TEXT BELOW IMAGE */}
               <div className="text-center mt-6">
                 <h3 className="tracking-[0.15em] text-sm font-medium mb-2">
                   {item.title}
                 </h3>
-
                 <p className="text-gray-600 text-sm mb-3">
                   {item.desc}
                 </p>
-
                 <span className="border-b border-black text-sm pb-1">
                   Check Now
                 </span>
               </div>
 
             </div>
-
           </Link>
         ))}
-
       </div>
 
-      {/* ================= MOBILE SLIDER ================= */}
+      {/* ================= MOBILE SLIDER (FIXED) ================= */}
       <div className="md:hidden">
 
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide px-4 gap-5"
+          className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide"
         >
           {items.map((item, i) => (
-            <Link key={i} to={item.link} className="min-w-full snap-start">
-
+            <Link
+              key={i}
+              to={item.link}
+              className="w-full shrink-0 snap-start px-4"
+            >
               <div>
 
                 <div className="h-[460px] overflow-hidden">
@@ -113,7 +109,7 @@ export default function CampaignSection() {
                   />
                 </div>
 
-                <div className="text-center mt-6 px-4">
+                <div className="text-center mt-6">
                   <h3 className="tracking-[0.15em] text-sm font-medium mb-2">
                     {item.title}
                   </h3>
@@ -128,12 +124,11 @@ export default function CampaignSection() {
                 </div>
 
               </div>
-
             </Link>
           ))}
         </div>
 
-        {/* DOTS ONLY (no arrows) */}
+        {/* DOTS */}
         <div className="flex justify-center mt-6 gap-3">
           {items.map((_, i) => (
             <button
