@@ -1,11 +1,9 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function CampaignSection() {
   const scrollRef = useRef(null);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const touchStartRef = useRef({ x: 0, y: 0 });
-  const isHorizontalRef = useRef(null);
 
   const items = [
     {
@@ -28,60 +26,26 @@ export default function CampaignSection() {
     },
   ];
 
+  /* Scroll when dots clicked */
   const scrollToSlide = (index) => {
     const container = scrollRef.current;
-    if (!container) return;
     const width = container.offsetWidth;
     container.scrollTo({ left: width * index, behavior: "smooth" });
     setCurrentSlide(index);
   };
 
+  /* Detect active slide while swiping */
   const handleScroll = () => {
     const container = scrollRef.current;
-    if (!container) return;
     const slideWidth = container.offsetWidth;
     const newSlide = Math.round(container.scrollLeft / slideWidth);
     setCurrentSlide(newSlide);
   };
 
-  useEffect(() => {
-    const container = scrollRef.current;
-    if (!container) return;
-
-    const onTouchStart = (e) => {
-      touchStartRef.current = {
-        x: e.touches[0].clientX,
-        y: e.touches[0].clientY,
-      };
-      isHorizontalRef.current = null;
-    };
-
-    const onTouchMove = (e) => {
-      const dx = Math.abs(e.touches[0].clientX - touchStartRef.current.x);
-      const dy = Math.abs(e.touches[0].clientY - touchStartRef.current.y);
-
-      if (isHorizontalRef.current === null) {
-        if (dx < 4 && dy < 4) return;
-        isHorizontalRef.current = dx > dy;
-      }
-
-      if (isHorizontalRef.current) {
-        e.preventDefault();
-      }
-    };
-
-    container.addEventListener("touchstart", onTouchStart, { passive: true });
-    container.addEventListener("touchmove", onTouchMove, { passive: false });
-
-    return () => {
-      container.removeEventListener("touchstart", onTouchStart);
-      container.removeEventListener("touchmove", onTouchMove);
-    };
-  }, []);
-
   return (
     <section className="bg-white pt-20 pb-24 relative z-10">
 
+      {/* HEADINGS */}
       <p className="text-center text-xs tracking-[0.4em] text-gray-500 mb-3">
         AUTUMN / WINTER
       </p>
@@ -90,11 +54,12 @@ export default function CampaignSection() {
         Campaign Styles
       </h2>
 
-      {/* DESKTOP */}
+      {/* ================= DESKTOP ================= */}
       <div className="hidden md:grid grid-cols-3 gap-10 max-w-[1500px] mx-auto px-10">
         {items.map((item, i) => (
           <Link key={i} to={item.link}>
             <div className="group">
+
               <div className="overflow-hidden h-[560px]">
                 <img
                   src={item.img}
@@ -102,26 +67,40 @@ export default function CampaignSection() {
                   className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
                 />
               </div>
+
               <div className="text-center mt-6">
                 <h3 className="tracking-[0.15em] text-sm font-medium mb-2">
                   {item.title}
                 </h3>
-                <p className="text-gray-600 text-sm mb-3">{item.desc}</p>
-                <span className="border-b border-black text-sm pb-1">
+
+                <p className="text-gray-600 text-sm mb-3">
+                  {item.desc}
+                </p>
+
+                {/* ⭐ NO LAYOUT SHIFT UNDERLINE */}
+                <span className="relative inline-block text-sm group">
                   Check Now
+                  <span className="absolute left-0 bottom-0 w-full h-[1px] bg-black scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></span>
                 </span>
+
               </div>
             </div>
           </Link>
         ))}
       </div>
 
-      {/* MOBILE */}
+      {/* ================= MOBILE SLIDER ================= */}
       <div className="md:hidden">
+
         <div
           ref={scrollRef}
           onScroll={handleScroll}
           className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+          style={{
+            touchAction: "pan-y pan-x",       // ⭐ critical mobile fix
+            WebkitOverflowScrolling: "touch", // ⭐ smooth iOS scroll
+            overscrollBehaviorX: "contain",   // ⭐ stop scroll chaining
+          }}
         >
           {items.map((item, i) => (
             <Link
@@ -130,6 +109,7 @@ export default function CampaignSection() {
               className="w-full shrink-0 snap-start px-4"
             >
               <div>
+
                 <div className="h-[460px] overflow-hidden">
                   <img
                     src={item.img}
@@ -137,34 +117,42 @@ export default function CampaignSection() {
                     className="w-full h-full object-cover"
                   />
                 </div>
+
                 <div className="text-center mt-6">
                   <h3 className="tracking-[0.15em] text-sm font-medium mb-2">
                     {item.title}
                   </h3>
-                  <p className="text-gray-600 text-sm mb-3">{item.desc}</p>
-                  <span className="border-b border-black text-sm pb-1">
+
+                  <p className="text-gray-600 text-sm mb-3">
+                    {item.desc}
+                  </p>
+
+                  {/* ⭐ NO LAYOUT SHIFT ON MOBILE TOO */}
+                  <span className="relative inline-block text-sm">
                     Check Now
+                    <span className="absolute left-0 bottom-0 w-full h-[1px] bg-black"></span>
                   </span>
+
                 </div>
               </div>
             </Link>
           ))}
         </div>
 
-        {/* DOTS */}
+        {/* DOT INDICATORS */}
         <div className="flex justify-center mt-6 gap-3">
           {items.map((_, i) => (
             <button
               key={i}
               onClick={() => scrollToSlide(i)}
-              className={`w-2.5 h-2.5 rounded-full transition-all ${
-                currentSlide === i ? "bg-black scale-125" : "bg-gray-400"
+              className={`w-2.5 h-2.5 rounded-full transition ${
+                currentSlide === i ? "bg-black" : "bg-gray-400"
               }`}
             />
           ))}
         </div>
-      </div>
 
+      </div>
     </section>
   );
 }
