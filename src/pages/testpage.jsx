@@ -2,6 +2,7 @@ import React from 'react'
 import CollectionSlider from "../components/common/CollectionSlider";
 import {GET_BESTSELLERS } from "../api/shopify/bestsellerCollection";
 import NewsletterSection from '../components/common/NewsletterSection';
+import ScrollIndicator from '../components/ScrollIndicator';
 
 function testpage() {
   return (
@@ -14,6 +15,8 @@ function testpage() {
              variables={{ first: 12 }}
            />
            <NewsletterSection/>  
+
+           <ScrollIndicator/>
 
     </div>
   )

@@ -13,7 +13,7 @@ export default function SplitImageVideoSection() {
             className="absolute inset-0 w-full h-full object-cover"
           />
 
-          {/* Text overlay */}
+          {/* TEXT */}
           <div className="relative z-10 p-10 md:p-20 text-white max-w-md">
             <p className="uppercase tracking-widest text-sm mb-4">
               Most-loved collections
@@ -31,12 +31,12 @@ export default function SplitImageVideoSection() {
             </Link>
           </div>
 
-          {/* subtle overlay for readability */}
+          {/* overlay */}
           <div className="absolute inset-0 bg-black/10" />
         </div>
 
-        {/* RIGHT: VIDEO */}
-        <div className="relative overflow-hidden bg-black">
+        {/* RIGHT: VIDEO (DESKTOP ONLY) */}
+        <div className="hidden md:block relative overflow-hidden bg-black">
           <video
             className="w-full h-full object-cover"
             autoPlay
