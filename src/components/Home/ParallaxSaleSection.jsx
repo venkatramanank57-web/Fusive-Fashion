@@ -41,11 +41,11 @@ export default function ParallaxSaleSection() {
         Change these numbers to control WHEN images appear/disappear
       */
 
-      const leftStart = 0.15; // left image appears
+      const leftStart = 0.10; // left image appears
       const leftEnd = 0.95; // left image disappears
 
-      const rightStart = 0.55; // right image appears
-      const rightEnd = 1; // right image disappears
+      const rightStart = 0.45; // right image appears
+      const rightEnd = 0.9; // right image disappears
 
       /*
         MOTION SETTINGS
