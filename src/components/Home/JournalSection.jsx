@@ -24,38 +24,28 @@ const posts = [
 
 export default function JournalSection() {
   const sliderRef = useRef(null);
-  const scrollTimeout = useRef(null); // ⭐ debounce timer
   const [index, setIndex] = useState(0);
 
-  /* Scroll when dots/arrows clicked */
+  /* Scroll when dots clicked */
   const scrollToIndex = (i) => {
+    if (!sliderRef.current) return;
     const width = sliderRef.current.offsetWidth;
     sliderRef.current.scrollTo({ left: width * i, behavior: "smooth" });
     setIndex(i);
   };
 
-  const next = () => scrollToIndex(Math.min(index + 1, posts.length - 1));
-  const prev = () => scrollToIndex(Math.max(index - 1, 0));
-
-  /* ⭐ PRODUCTION MOBILE SCROLL FIX */
+  /* ⭐ FIXED SCROLL DETECTION ⭐ */
   const handleScroll = () => {
     if (!sliderRef.current) return;
-
-    // clear old timer
-    if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-
-    // run ONLY after scrolling stops
-    scrollTimeout.current = setTimeout(() => {
-      const container = sliderRef.current;
-      const slideWidth = container.offsetWidth;
-
-      // ⭐ prevents slide skipping
-      const newIndex = Math.floor(
-        (container.scrollLeft + slideWidth / 2) / slideWidth
-      );
-
+    const container = sliderRef.current;
+    const slideWidth = container.offsetWidth;
+    
+    // Smooth-ah index detect panna Math.round use pannalam
+    const newIndex = Math.round(container.scrollLeft / slideWidth);
+    
+    if (newIndex !== index && newIndex < posts.length) {
       setIndex(newIndex);
-    }, 120);
+    }
   };
 
   return (
@@ -71,52 +61,42 @@ export default function JournalSection() {
         </h2>
       </div>
 
-      <div className="relative">
+      <div className="relative overflow-hidden">
 
-        {/* MOBILE PREV */}
-        {/* {index > 0 && (
-          <button
-            onClick={prev}
-            className="lg:hidden absolute left-4 top-[40%] z-10 w-11 h-11 bg-white/90 rounded-full shadow flex items-center justify-center"
-          >
-            <ChevronLeft size={20} />
-          </button>
-        )} */}
-
-        {/* MOBILE NEXT */}
-        {/* {index < posts.length - 1 && (
-          <button
-            onClick={next}
-            className="lg:hidden absolute right-4 top-[40%] z-10 w-11 h-11 bg-white/90 rounded-full shadow flex items-center justify-center"
-          >
-            <ChevronRight size={20} />
-          </button>
-        )} */}
-
-        {/* SLIDER */}
+        {/* SLIDER CONTAINER */}
         <div
           ref={sliderRef}
           onScroll={handleScroll}
-          className="flex lg:grid lg:grid-cols-3 overflow-x-auto lg:overflow-visible snap-x snap-mandatory scrollbar-hide"
+          // ⭐ FIXED CSS CLASSES: snap-always logic inga dhaan iruku
+          className="flex lg:grid lg:grid-cols-3 overflow-x-auto lg:overflow-visible snap-x snap-mandatory scrollbar-hide scroll-smooth"
           style={{
             touchAction: "pan-y pan-x",
             WebkitOverflowScrolling: "touch",
-            overscrollBehaviorX: "contain",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
           }}
         >
+          <style>{`div::-webkit-scrollbar { display: none; }`}</style>
+          
           {posts.map((post) => (
-            <BlogCard key={post.id} post={post} />
+            <div 
+              key={post.id} 
+              // ⭐ MUKKIYAM: snap-always added here
+              className="w-full shrink-0 snap-start snap-always"
+            >
+              <BlogCard post={post} />
+            </div>
           ))}
         </div>
 
         {/* DOTS */}
-        <div className="flex lg:hidden justify-center mt-6 gap-2">
+        <div className="flex lg:hidden justify-center mt-6 gap-3">
           {posts.map((_, i) => (
             <button
               key={i}
               onClick={() => scrollToIndex(i)}
-              className={`w-2.5 h-2.5 rounded-full transition ${
-                index === i ? "bg-black" : "bg-gray-300"
+              className={`transition-all duration-300 rounded-full ${
+                index === i ? "w-6 h-2 bg-black" : "w-2 h-2 bg-gray-300"
               }`}
             />
           ))}
@@ -129,30 +109,28 @@ export default function JournalSection() {
 
 function BlogCard({ post }) {
   return (
-    <div className="w-full flex-shrink-0 lg:min-w-0 snap-start">
-
-      <div className="overflow-hidden h-[380px] sm:h-[420px] lg:aspect-square lg:h-auto">
+    <div className="px-4">
+      <div className="overflow-hidden h-[380px] sm:h-[420px] lg:aspect-square lg:h-auto rounded-sm shadow-sm">
         <img
           src={post.img}
           alt={post.title}
-          className="w-full h-full object-cover hover:scale-105 transition duration-500"
+          className="w-full h-full object-cover hover:scale-105 transition duration-700"
         />
       </div>
 
-      <div className="bg-[#f3f3f3] text-center px-6 py-8 lg:py-10">
-        <h3 className="tracking-[2px] text-[18px] lg:text-[20px] font-medium text-[#2b2b2b] mb-4">
+      <div className="text-center px-2 py-8 lg:py-10">
+        <h3 className="tracking-[1px] text-[18px] lg:text-[20px] font-medium text-[#2b2b2b] mb-4 uppercase">
           {post.title}
         </h3>
 
-        <p className="text-[#4a4a4a] text-[14px] leading-relaxed mb-6 max-w-[320px] mx-auto">
+        <p className="text-[#4a4a4a] text-[14px] leading-relaxed mb-6 max-w-[320px] mx-auto line-clamp-3">
           {post.desc}
         </p>
 
-        <button className="border-b border-[#2b2b2b] pb-1 text-[14px] font-medium">
-          Read more
+        <button className="border-b border-[#2b2b2b] pb-1 text-[13px] font-semibold tracking-wider hover:text-gray-500 transition">
+          READ MORE
         </button>
       </div>
-
     </div>
   );
 }

@@ -29,34 +29,33 @@ export default function CampaignSection() {
   /* DOT CLICK */
   const scrollToSlide = (index) => {
     const container = scrollRef.current;
+    if (!container) return;
     const width = container.offsetWidth;
     container.scrollTo({ left: width * index, behavior: "smooth" });
     setCurrentSlide(index);
   };
 
-  /* SWIPE DETECTION */
+  /* SWIPE DETECTION - FIXED SYNC */
   const handleScroll = () => {
     const container = scrollRef.current;
+    if (!container) return;
     const slideWidth = container.offsetWidth;
+    // Sensitive detection
     const newSlide = Math.round(container.scrollLeft / slideWidth);
-    setCurrentSlide(newSlide);
+    if (newSlide !== currentSlide && newSlide < items.length) {
+      setCurrentSlide(newSlide);
+    }
   };
 
   /* MOBILE ARROWS */
   const nextSlide = () => {
-    const container = scrollRef.current;
-    const width = container.offsetWidth;
     const newIndex = Math.min(currentSlide + 1, items.length - 1);
-    container.scrollTo({ left: width * newIndex, behavior: "smooth" });
-    setCurrentSlide(newIndex);
+    scrollToSlide(newIndex);
   };
 
   const prevSlide = () => {
-    const container = scrollRef.current;
-    const width = container.offsetWidth;
     const newIndex = Math.max(currentSlide - 1, 0);
-    container.scrollTo({ left: width * newIndex, behavior: "smooth" });
-    setCurrentSlide(newIndex);
+    scrollToSlide(newIndex);
   };
 
   return (
@@ -85,12 +84,10 @@ export default function CampaignSection() {
               </div>
 
               <div className="text-center mt-6">
-                <h3 className="tracking-[0.15em] text-sm font-medium mb-2">
+                <h3 className="tracking-[0.15em] text-sm font-medium mb-2 uppercase">
                   {item.title}
                 </h3>
-
                 <p className="text-gray-600 text-sm mb-3">{item.desc}</p>
-
                 <span className="relative inline-block text-sm group">
                   Check Now
                   <span className="absolute left-0 bottom-0 w-full h-[1px] bg-black scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"/>
@@ -103,30 +100,27 @@ export default function CampaignSection() {
 
       {/* ================= MOBILE SLIDER ================= */}
       <div className="md:hidden">
-
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+          className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide scroll-smooth"
           style={{
             touchAction: "pan-y pan-x",
             WebkitOverflowScrolling: "touch",
-            overscrollBehaviorX: "contain",
-            scrollSnapType: "x mandatory",
-            scrollPaddingLeft: "16px",
-            scrollPaddingRight: "16px",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
           }}
         >
           {items.map((item, i) => (
             <Link
               key={i}
               to={item.link}
+              /* ⭐ FIX: snap-always dhaan intermediate slides skip aaguradha thadukkum */
               className="w-full shrink-0 snap-start snap-always px-4"
             >
               <div>
-
                 {/* IMAGE + MOBILE ARROWS */}
-                <div className="relative h-[460px] overflow-hidden">
+                <div className="relative h-[460px] overflow-hidden rounded-sm">
                   <img
                     src={item.img}
                     alt={item.title}
@@ -137,9 +131,9 @@ export default function CampaignSection() {
                   {currentSlide > 0 && (
                     <button
                       onClick={(e) => { e.preventDefault(); prevSlide(); }}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 rounded-full shadow flex items-center justify-center"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full shadow-md flex items-center justify-center z-20"
                     >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                         <polyline points="15 18 9 12 15 6" />
                       </svg>
                     </button>
@@ -149,9 +143,9 @@ export default function CampaignSection() {
                   {currentSlide < items.length - 1 && (
                     <button
                       onClick={(e) => { e.preventDefault(); nextSlide(); }}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 rounded-full shadow flex items-center justify-center"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full shadow-md flex items-center justify-center z-20"
                     >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                         <polyline points="9 18 15 12 9 6" />
                       </svg>
                     </button>
@@ -159,35 +153,32 @@ export default function CampaignSection() {
                 </div>
 
                 {/* TEXT */}
-                <div className="text-center mt-6">
-                  <h3 className="tracking-[0.15em] text-sm font-medium mb-2">
+                <div className="text-center mt-6 px-2">
+                  <h3 className="tracking-[0.15em] text-sm font-medium mb-2 uppercase">
                     {item.title}
                   </h3>
                   <p className="text-gray-600 text-sm mb-3">{item.desc}</p>
-                  <span className="relative inline-block text-sm">
+                  <span className="relative inline-block text-sm border-b border-black pb-0.5">
                     Check Now
-                    <span className="absolute left-0 bottom-0 w-full h-[1px] bg-black"/>
                   </span>
                 </div>
-
               </div>
             </Link>
           ))}
         </div>
 
         {/* DOTS */}
-        <div className="flex justify-center mt-6 gap-3">
+        <div className="flex justify-center mt-8 gap-3">
           {items.map((_, i) => (
             <button
               key={i}
               onClick={() => scrollToSlide(i)}
-              className={`w-2.5 h-2.5 rounded-full transition ${
-                currentSlide === i ? "bg-black" : "bg-gray-400"
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                currentSlide === i ? "bg-black w-5" : "bg-gray-300"
               }`}
             />
           ))}
         </div>
-
       </div>
     </section>
   );

@@ -45,7 +45,7 @@ export default function ParallaxSaleSection() {
       const leftEnd = 0.95; // left image disappears
 
       const rightStart = 0.45; // right image appears
-      const rightEnd = 0.9; // right image disappears
+      const rightEnd = 0.8; // right image disappears
 
       /*
         MOTION SETTINGS

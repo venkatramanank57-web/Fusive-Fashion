@@ -17,10 +17,11 @@ export default function CollectionSlider({ title, query, variables }) {
     [];
 
   // Responsive items per slide
-  const getItemsPerSlide = () => (window.innerWidth >= 768 ? 4 : 2);
-  const [itemsPerSlide, setItemsPerSlide] = useState(getItemsPerSlide());
+  const getItemsPerSlide = () => (typeof window !== 'undefined' && window.innerWidth >= 768 ? 4 : 2);
+  const [itemsPerSlide, setItemsPerSlide] = useState(2);
 
   useEffect(() => {
+    setItemsPerSlide(getItemsPerSlide());
     const resize = () => setItemsPerSlide(getItemsPerSlide());
     window.addEventListener("resize", resize);
     return () => window.removeEventListener("resize", resize);
@@ -38,10 +39,10 @@ export default function CollectionSlider({ title, query, variables }) {
     container.scrollTo({ left: slideWidth * index, behavior: "smooth" });
     setCurrentSlide(index);
     
-    // Allow next scroll after animation completes
+    // Lock release timing
     setTimeout(() => {
       setIsScrolling(false);
-    }, 400); // Match this with smooth scroll duration
+    }, 500); 
   };
 
   const nextSlide = () => {
@@ -61,6 +62,7 @@ export default function CollectionSlider({ title, query, variables }) {
     if (!container || isScrolling) return;
     
     const slideWidth = container.offsetWidth;
+    // Math.round ensures we sync the dots/progress bar correctly
     const newSlide = Math.round(container.scrollLeft / slideWidth);
     
     if (newSlide !== currentSlide) {
@@ -114,11 +116,11 @@ export default function CollectionSlider({ title, query, variables }) {
           <div
             ref={scrollRef}
             onScroll={handleScroll}
-            className="flex overflow-x-auto snap-x snap-mandatory pb-2"
+            className="flex overflow-x-auto snap-x snap-mandatory pb-2 scroll-smooth"
             style={{
-              scrollBehavior: "smooth",
               scrollbarWidth: "none",
               msOverflowStyle: "none",
+              WebkitOverflowScrolling: "touch", // Mobile smooth control
             }}
           >
             <style>{`div::-webkit-scrollbar { display: none; }`}</style>
@@ -126,7 +128,10 @@ export default function CollectionSlider({ title, query, variables }) {
             {Array.from({ length: totalSlides }).map((_, slideIndex) => (
               <div
                 key={slideIndex}
-                className="min-w-full snap-start grid grid-cols-2 md:grid-cols-4 gap-4 px-2"
+                /* ⭐ FIX: 'snap-always' class add panniruken. 
+                   Idhu dhaan user fast-ah scroll pannaalum momentum-ah adutha slide-laye stop pannum. 
+                */
+                className="min-w-full snap-start snap-always grid grid-cols-2 md:grid-cols-4 gap-4 px-2"
               >
                 {products
                   .slice(
@@ -140,7 +145,7 @@ export default function CollectionSlider({ title, query, variables }) {
             ))}
           </div>
 
-          {/* ⭐ FULL WIDTH PROGRESS BAR */}
+          {/* ⭐ PROGRESS BAR */}
           {totalSlides > 1 && (
             <div className="w-full mt-10">
               <div className="h-[4px] bg-gray-200 relative">
