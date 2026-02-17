@@ -26,7 +26,7 @@ export default function CampaignSection() {
     },
   ];
 
-  /* Scroll when dots clicked */
+  /* DOT CLICK */
   const scrollToSlide = (index) => {
     const container = scrollRef.current;
     const width = container.offsetWidth;
@@ -34,12 +34,29 @@ export default function CampaignSection() {
     setCurrentSlide(index);
   };
 
-  /* Detect active slide while swiping */
+  /* SWIPE DETECTION */
   const handleScroll = () => {
     const container = scrollRef.current;
     const slideWidth = container.offsetWidth;
     const newSlide = Math.round(container.scrollLeft / slideWidth);
     setCurrentSlide(newSlide);
+  };
+
+  /* MOBILE ARROWS */
+  const nextSlide = () => {
+    const container = scrollRef.current;
+    const width = container.offsetWidth;
+    const newIndex = Math.min(currentSlide + 1, items.length - 1);
+    container.scrollTo({ left: width * newIndex, behavior: "smooth" });
+    setCurrentSlide(newIndex);
+  };
+
+  const prevSlide = () => {
+    const container = scrollRef.current;
+    const width = container.offsetWidth;
+    const newIndex = Math.max(currentSlide - 1, 0);
+    container.scrollTo({ left: width * newIndex, behavior: "smooth" });
+    setCurrentSlide(newIndex);
   };
 
   return (
@@ -59,7 +76,6 @@ export default function CampaignSection() {
         {items.map((item, i) => (
           <Link key={i} to={item.link}>
             <div className="group">
-
               <div className="overflow-hidden h-[560px]">
                 <img
                   src={item.img}
@@ -73,16 +89,12 @@ export default function CampaignSection() {
                   {item.title}
                 </h3>
 
-                <p className="text-gray-600 text-sm mb-3">
-                  {item.desc}
-                </p>
+                <p className="text-gray-600 text-sm mb-3">{item.desc}</p>
 
-                {/* ⭐ NO LAYOUT SHIFT UNDERLINE */}
                 <span className="relative inline-block text-sm group">
                   Check Now
-                  <span className="absolute left-0 bottom-0 w-full h-[1px] bg-black scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></span>
+                  <span className="absolute left-0 bottom-0 w-full h-[1px] bg-black scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"/>
                 </span>
-
               </div>
             </div>
           </Link>
@@ -97,49 +109,73 @@ export default function CampaignSection() {
           onScroll={handleScroll}
           className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide"
           style={{
-            touchAction: "pan-y pan-x",       // ⭐ critical mobile fix
-            WebkitOverflowScrolling: "touch", // ⭐ smooth iOS scroll
-            overscrollBehaviorX: "contain",   // ⭐ stop scroll chaining
+            touchAction: "pan-y pan-x",
+            WebkitOverflowScrolling: "touch",
+            overscrollBehaviorX: "contain",
+            scrollSnapType: "x mandatory",
+            scrollPaddingLeft: "16px",
+            scrollPaddingRight: "16px",
           }}
         >
           {items.map((item, i) => (
             <Link
               key={i}
               to={item.link}
-              className="w-full shrink-0 snap-start px-4"
+              className="w-full shrink-0 snap-start snap-always px-4"
             >
               <div>
 
-                <div className="h-[460px] overflow-hidden">
+                {/* IMAGE + MOBILE ARROWS */}
+                <div className="relative h-[460px] overflow-hidden">
                   <img
                     src={item.img}
                     alt={item.title}
                     className="w-full h-full object-cover"
                   />
+
+                  {/* PREV */}
+                  {currentSlide > 0 && (
+                    <button
+                      onClick={(e) => { e.preventDefault(); prevSlide(); }}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 rounded-full shadow flex items-center justify-center"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="15 18 9 12 15 6" />
+                      </svg>
+                    </button>
+                  )}
+
+                  {/* NEXT */}
+                  {currentSlide < items.length - 1 && (
+                    <button
+                      onClick={(e) => { e.preventDefault(); nextSlide(); }}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 rounded-full shadow flex items-center justify-center"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="9 18 15 12 9 6" />
+                      </svg>
+                    </button>
+                  )}
                 </div>
 
+                {/* TEXT */}
                 <div className="text-center mt-6">
                   <h3 className="tracking-[0.15em] text-sm font-medium mb-2">
                     {item.title}
                   </h3>
-
-                  <p className="text-gray-600 text-sm mb-3">
-                    {item.desc}
-                  </p>
-
-                  {/* ⭐ NO LAYOUT SHIFT ON MOBILE TOO */}
+                  <p className="text-gray-600 text-sm mb-3">{item.desc}</p>
                   <span className="relative inline-block text-sm">
                     Check Now
-                    <span className="absolute left-0 bottom-0 w-full h-[1px] bg-black"></span>
+                    <span className="absolute left-0 bottom-0 w-full h-[1px] bg-black"/>
                   </span>
-
                 </div>
+
               </div>
             </Link>
           ))}
         </div>
 
-        {/* DOT INDICATORS */}
+        {/* DOTS */}
         <div className="flex justify-center mt-6 gap-3">
           {items.map((_, i) => (
             <button

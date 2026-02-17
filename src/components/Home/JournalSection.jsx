@@ -23,26 +23,47 @@ const posts = [
 ];
 
 export default function JournalSection() {
-  const sliderRef = useRef();
+  const sliderRef = useRef(null);
+  const scrollTimeout = useRef(null); // ⭐ debounce timer
   const [index, setIndex] = useState(0);
 
+  /* Scroll when dots/arrows clicked */
   const scrollToIndex = (i) => {
-    sliderRef.current.scrollTo({
-      left: sliderRef.current.offsetWidth * i,
-      behavior: "smooth",
-    });
+    const width = sliderRef.current.offsetWidth;
+    sliderRef.current.scrollTo({ left: width * i, behavior: "smooth" });
     setIndex(i);
   };
 
   const next = () => scrollToIndex(Math.min(index + 1, posts.length - 1));
   const prev = () => scrollToIndex(Math.max(index - 1, 0));
 
+  /* ⭐ PRODUCTION MOBILE SCROLL FIX */
+  const handleScroll = () => {
+    if (!sliderRef.current) return;
+
+    // clear old timer
+    if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+
+    // run ONLY after scrolling stops
+    scrollTimeout.current = setTimeout(() => {
+      const container = sliderRef.current;
+      const slideWidth = container.offsetWidth;
+
+      // ⭐ prevents slide skipping
+      const newIndex = Math.floor(
+        (container.scrollLeft + slideWidth / 2) / slideWidth
+      );
+
+      setIndex(newIndex);
+    }, 120);
+  };
+
   return (
     <section className="bg-[#f3f3f3] pt-8 lg:pt-12 pb-12 lg:pb-16 relative z-10">
 
       {/* HEADER */}
       <div className="max-w-[1300px] mx-auto px-6 text-center mb-8 lg:mb-12">
-        <p className="uppercase tracking-[3px] text-[12px] lg:text-[13px] text-gray-500 mb-2">
+        <p className="uppercase tracking-[3px] text-[12px] text-gray-500 mb-2">
           Fashion Blog
         </p>
         <h2 className="text-[28px] lg:text-[42px] font-light tracking-wide">
@@ -52,29 +73,36 @@ export default function JournalSection() {
 
       <div className="relative">
 
-        {/* MOBILE ARROWS
-        <button
-          onClick={prev}
-          className="lg:hidden absolute left-3 top-[42%] z-10 bg-white shadow-md p-2 rounded-full"
-        >
-          <ChevronLeft size={20} />
-        </button>
+        {/* MOBILE PREV */}
+        {/* {index > 0 && (
+          <button
+            onClick={prev}
+            className="lg:hidden absolute left-4 top-[40%] z-10 w-11 h-11 bg-white/90 rounded-full shadow flex items-center justify-center"
+          >
+            <ChevronLeft size={20} />
+          </button>
+        )} */}
 
-        <button
-          onClick={next}
-          className="lg:hidden absolute right-3 top-[42%] z-10 bg-white shadow-md p-2 rounded-full"
-        >
-          <ChevronRight size={20} />
-        </button> */}
+        {/* MOBILE NEXT */}
+        {/* {index < posts.length - 1 && (
+          <button
+            onClick={next}
+            className="lg:hidden absolute right-4 top-[40%] z-10 w-11 h-11 bg-white/90 rounded-full shadow flex items-center justify-center"
+          >
+            <ChevronRight size={20} />
+          </button>
+        )} */}
 
-        {/* SLIDER / GRID */}
+        {/* SLIDER */}
         <div
           ref={sliderRef}
-          className="
-            flex lg:grid lg:grid-cols-3
-            overflow-x-auto lg:overflow-visible
-            snap-x snap-mandatory scroll-smooth no-scrollbar
-          "
+          onScroll={handleScroll}
+          className="flex lg:grid lg:grid-cols-3 overflow-x-auto lg:overflow-visible snap-x snap-mandatory scrollbar-hide"
+          style={{
+            touchAction: "pan-y pan-x",
+            WebkitOverflowScrolling: "touch",
+            overscrollBehaviorX: "contain",
+          }}
         >
           {posts.map((post) => (
             <BlogCard key={post.id} post={post} />
@@ -87,12 +115,13 @@ export default function JournalSection() {
             <button
               key={i}
               onClick={() => scrollToIndex(i)}
-              className={`w-2 h-2 rounded-full ${
+              className={`w-2.5 h-2.5 rounded-full transition ${
                 index === i ? "bg-black" : "bg-gray-300"
               }`}
             />
           ))}
         </div>
+
       </div>
     </section>
   );
@@ -100,9 +129,8 @@ export default function JournalSection() {
 
 function BlogCard({ post }) {
   return (
-    <div className="w-full flex-shrink-0 lg:min-w-0">
+    <div className="w-full flex-shrink-0 lg:min-w-0 snap-start">
 
-      {/* MOBILE IMAGE HEIGHT FIX */}
       <div className="overflow-hidden h-[380px] sm:h-[420px] lg:aspect-square lg:h-auto">
         <img
           src={post.img}
@@ -111,7 +139,6 @@ function BlogCard({ post }) {
         />
       </div>
 
-      {/* TEXT */}
       <div className="bg-[#f3f3f3] text-center px-6 py-8 lg:py-10">
         <h3 className="tracking-[2px] text-[18px] lg:text-[20px] font-medium text-[#2b2b2b] mb-4">
           {post.title}
@@ -121,10 +148,11 @@ function BlogCard({ post }) {
           {post.desc}
         </p>
 
-        <button className="border-b border-[#2b2b2b] pb-1 text-[14px] font-medium text-[#2b2b2b]">
+        <button className="border-b border-[#2b2b2b] pb-1 text-[14px] font-medium">
           Read more
         </button>
       </div>
+
     </div>
   );
 }
