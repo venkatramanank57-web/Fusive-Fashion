@@ -1,21 +1,34 @@
-import { Outlet } from "react-router-dom";
+// MainLayout.jsx
+import { Outlet, useLocation } from "react-router-dom";
 import StickyHeader from "../components/StickyHeader";
 import Footer from "../components/Footer";
-import CookieConsent from "../components/CookieConsent";
-import FooterSpacer from "../components/FooterSpacer";
+import { useEffect, useState } from "react";
 
 export default function MainLayout() {
+  const [isReady, setIsReady] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    // Page load aagumpodhu oru micro-delay
+    const timer = setTimeout(() => {
+      setIsReady(true);
+    }, 1200); // 1.2 seconds safe for home loading
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-white">
       <StickyHeader />
 
-      <main className="flex-1  relative z-20">
+      <main className="flex-grow relative z-20">
         <Outlet />
-        <FooterSpacer />   {/* ⭐ IMPORTANT */}
       </main>
 
-      <Footer />
-      <CookieConsent />
+      {/* ⭐ Footer reserve height: Jump aaguradha thadukkum */}
+      <div className="min-h-[300px] w-full">
+         {isReady && <Footer />}
+      </div>
     </div>
   );
 }
